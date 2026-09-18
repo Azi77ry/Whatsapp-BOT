@@ -4,12 +4,12 @@ const path = require('path');
 
 async function helpCommand(sock, chatId, message) {
     const helpMessage = `
-╔═══════════════════╗
-   *🤖 ${settings.botName || 'KnightBot-MD'}*  
-   Version: *${settings.version || '3.0.0'}*
-   by ${settings.botOwner || 'Mr Unique Hacker'}
-   YT : ${global.ytch}
-╚═══════════════════╝
+╔═══════════════════════════╗
+   *🤖 ${settings.botName || 'Knight Bot'}*  
+   *Version:* ${settings.version || '3.0.7'}
+   *Powered by:* ${settings.botOwner || 'Azirytech'}
+   *Status:* 🟢 Online & Multi-Session
+╚═══════════════════════════╝
 
 *Available Commands:*
 
@@ -220,9 +220,10 @@ async function helpCommand(sock, chatId, message) {
 ║ ➤ .sc
 ║ ➤ .script
 ║ ➤ .repo
-╚═══════════════════╝
+╚═══════════════════════════╝
 
-Join our channel for updates:`;
+📢 *Official Channel:* ${settings.supportChannel || 'https://whatsapp.com/channel/0029Va90zAnIHphOuO8Msp3A'}
+✉️ *Official Support:* ${settings.supportEmail || 'support@azirytech.com'}`;
 
     try {
         const imagePath = path.join(__dirname, '../assets/bot_image.jpg');
