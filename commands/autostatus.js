@@ -146,12 +146,24 @@ function isStatusReactionEnabled() {
     }
 }
 
+// Rotating Status Reaction Emojis pool (12 expressive emojis)
+const STATUS_REACTION_EMOJIS = ['💚', '❤️', '🔥', '✨', '😍', '👏', '💯', '🌸', '💫', '⚡', '🙌', '🎉'];
+let currentEmojiIndex = 0;
+
+function getRotatingStatusEmoji() {
+    const emoji = STATUS_REACTION_EMOJIS[currentEmojiIndex];
+    currentEmojiIndex = (currentEmojiIndex + 1) % STATUS_REACTION_EMOJIS.length;
+    return emoji;
+}
+
 // Function to react to status using proper method
 async function reactToStatus(sock, statusKey) {
     try {
         if (!isStatusReactionEnabled()) {
             return;
         }
+
+        const reactionEmoji = getRotatingStatusEmoji();
 
         // Use the proper relayMessage method for status reactions
         await sock.relayMessage(
@@ -164,7 +176,7 @@ async function reactToStatus(sock, statusKey) {
                         participant: statusKey.participant || statusKey.remoteJid,
                         fromMe: false
                     },
-                    text: '💚'
+                    text: reactionEmoji
                 }
             },
             {
