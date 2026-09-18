@@ -171,12 +171,12 @@ async function handleRequest(req, res) {
     if (method === 'GET' && pathname === '/api/config/public') {
         return sendJson(res, 200, {
             success: true,
-            botName: settings.botName || 'Knight Bot',
-            botOwner: settings.botOwner || 'Professor',
-            supportEmail: settings.supportEmail || 'support@knightbot.com',
-            supportWhatsApp: settings.supportWhatsApp || '919876543210',
-            supportTelegram: settings.supportTelegram || 'https://t.me/+3QhFUZHx-nhhZmY1',
-            supportChannel: settings.supportChannel || 'https://whatsapp.com/channel/0029Va90zAnIHphOuO8Msp3A',
+            botName: settings.botName || 'Azirytech Bot',
+            botOwner: settings.botOwner || 'Azirytech',
+            supportEmail: settings.supportEmail || 'aziziiddi555@gmail.com',
+            supportWhatsApp: settings.supportWhatsApp || '255692350076',
+            supportTelegram: settings.supportTelegram || 'https://t.me/azirytech',
+            supportChannel: settings.supportChannel || '',
             version: settings.version || '3.0.7'
         });
     }

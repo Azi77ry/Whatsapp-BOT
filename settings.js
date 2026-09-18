@@ -5,11 +5,11 @@ const crypto = require('crypto');
 const dynamicFallbackPass = crypto.randomBytes(8).toString('hex');
 
 const settings = {
-  packname: process.env.BOT_NAME || 'Knight Bot',
+  packname: process.env.BOT_NAME || 'Azirytech Bot',
   author: process.env.BOT_OWNER || 'Azirytech',
-  botName: process.env.BOT_NAME || 'Knight Bot',
+  botName: process.env.BOT_NAME || 'Azirytech Bot',
   botOwner: process.env.BOT_OWNER || 'Azirytech',
-  ownerNumber: (process.env.OWNER_NUMBER || '').replace(/[^0-9]/g, ''),
+  ownerNumber: (process.env.OWNER_NUMBER || '255692350076').replace(/[^0-9]/g, ''),
   giphyApiKey: process.env.GIPHY_API_KEY || '',
   commandMode: process.env.COMMAND_MODE || 'public',
   maxStoreMessages: parseInt(process.env.MAX_STORE_MESSAGES || '20', 10),
@@ -20,10 +20,10 @@ const settings = {
   adminUsername: process.env.ADMIN_USER || 'admin',
   adminPassword: process.env.ADMIN_PASSWORD || dynamicFallbackPass,
   maxSessions: parseInt(process.env.MAX_SESSIONS || '100', 10),
-  supportEmail: process.env.SUPPORT_EMAIL || 'support@azirytech.com',
-  supportWhatsApp: (process.env.SUPPORT_WA || '').replace(/[^0-9]/g, ''),
+  supportEmail: process.env.SUPPORT_EMAIL || 'aziziiddi555@gmail.com',
+  supportWhatsApp: (process.env.SUPPORT_WA || '255692350076').replace(/[^0-9]/g, ''),
   supportTelegram: process.env.SUPPORT_TG || 'https://t.me/azirytech',
-  supportChannel: process.env.SUPPORT_CHANNEL || 'https://whatsapp.com/channel/0029Va90zAnIHphOuO8Msp3A',
+  supportChannel: process.env.SUPPORT_CHANNEL || '',
   updateZipUrl: 'https://github.com/mruniquehacker/Knightbot-MD/archive/refs/heads/main.zip',
 };
 

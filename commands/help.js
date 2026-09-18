@@ -5,7 +5,7 @@ const path = require('path');
 async function helpCommand(sock, chatId, message) {
     const helpMessage = `
 ╔═══════════════════════════╗
-   *🤖 ${settings.botName || 'Knight Bot'}*  
+   *🤖 Azirytech Bot*  
    *Version:* ${settings.version || '3.0.7'}
    *Powered by:* ${settings.botOwner || 'Azirytech'}
    *Status:* 🟢 Online & Multi-Session
@@ -103,51 +103,6 @@ async function helpCommand(sock, chatId, message) {
 ╚═══════════════════╝  
 
 ╔═══════════════════╗
-🖼️ *Pies Commands*:
-║ ➤ .pies <country>
-║ ➤ .china 
-║ ➤ .indonesia 
-║ ➤ .japan 
-║ ➤ .korea 
-║ ➤ .hijab
-╚═══════════════════╝
-
-╔═══════════════════╗
-🎮 *Game Commands*:
-║ ➤ .tictactoe @user
-║ ➤ .hangman
-║ ➤ .guess <letter>
-║ ➤ .trivia
-║ ➤ .answer <answer>
-║ ➤ .truth
-║ ➤ .dare
-╚═══════════════════╝
-
-╔═══════════════════╗
-🤖 *AI Commands*:
-║ ➤ .gpt <question>
-║ ➤ .gemini <question>
-║ ➤ .imagine <prompt>
-║ ➤ .flux <prompt>
-║ ➤ .sora <prompt>
-╚═══════════════════╝
-
-╔═══════════════════╗
-🎯 *Fun Commands*:
-║ ➤ .compliment @user
-║ ➤ .insult @user
-║ ➤ .flirt 
-║ ➤ .shayari
-║ ➤ .goodnight
-║ ➤ .roseday
-║ ➤ .character @user
-║ ➤ .wasted @user
-║ ➤ .ship @user
-║ ➤ .simp @user
-║ ➤ .stupid @user [text]
-╚═══════════════════╝
-
-╔═══════════════════╗
 🔤 *Textmaker*:
 ║ ➤ .metallic <text>
 ║ ➤ .ice <text>
@@ -181,49 +136,10 @@ async function helpCommand(sock, chatId, message) {
 ║ ➤ .ytmp4 <Link>
 ╚═══════════════════╝
 
-╔═══════════════════╗
-🧩 *MISC*:
-║ ➤ .heart
-║ ➤ .horny
-║ ➤ .circle
-║ ➤ .lgbt
-║ ➤ .lolice
-║ ➤ .its-so-stupid
-║ ➤ .namecard 
-║ ➤ .oogway
-║ ➤ .tweet
-║ ➤ .ytcomment 
-║ ➤ .comrade 
-║ ➤ .gay 
-║ ➤ .glass 
-║ ➤ .jail 
-║ ➤ .passed 
-║ ➤ .triggered
-╚═══════════════════╝
-
-╔═══════════════════╗
-🖼️ *ANIME*:
-║ ➤ .nom 
-║ ➤ .poke 
-║ ➤ .cry 
-║ ➤ .kiss 
-║ ➤ .pat 
-║ ➤ .hug 
-║ ➤ .wink 
-║ ➤ .facepalm 
-╚═══════════════════╝
-
-╔═══════════════════╗
-💻 *Github Commands:*
-║ ➤ .git
-║ ➤ .github
-║ ➤ .sc
-║ ➤ .script
-║ ➤ .repo
-╚═══════════════════════════╝
-
-📢 *Official Channel:* ${settings.supportChannel || 'https://whatsapp.com/channel/0029Va90zAnIHphOuO8Msp3A'}
-✉️ *Official Support:* ${settings.supportEmail || 'support@azirytech.com'}`;
+╔═══════════════════════════╗
+✉️ *Official Support:* aziziiddi555@gmail.com
+📞 *Contact Phone:* +255692350076
+╚═══════════════════════════╝`;
 
     try {
         const imagePath = path.join(__dirname, '../assets/bot_image.jpg');
@@ -237,12 +153,7 @@ async function helpCommand(sock, chatId, message) {
                     caption: helpMessage,
                     contextInfo: {
                         forwardingScore: 1,
-                        isForwarded: true,
-                        forwardedNewsletterMessageInfo: {
-                            newsletterJid: '120363161513685998@newsletter',
-                            newsletterName: 'KnightBot MD',
-                            serverMessageId: -1
-                        }
+                        isForwarded: true
                     }
                 }, { quoted: message });
                 imageSent = true;
@@ -256,12 +167,7 @@ async function helpCommand(sock, chatId, message) {
                 text: helpMessage,
                 contextInfo: {
                     forwardingScore: 1,
-                    isForwarded: true,
-                    forwardedNewsletterMessageInfo: {
-                        newsletterJid: '120363161513685998@newsletter',
-                        newsletterName: 'KnightBot MD',
-                        serverMessageId: -1
-                    } 
+                    isForwarded: true
                 }
             }, { quoted: message });
         }
