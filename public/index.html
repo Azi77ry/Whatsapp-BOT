@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knight Bot MD - Multi-Session Cloud Platform</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="glow-bg glow-1"></div>
+    <div class="glow-bg glow-2"></div>
+    <div class="grid-overlay"></div>
+
+    <!-- Main Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <div class="brand-icon">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+                <div class="brand-text">
+                    <span class="brand-title">KNIGHT BOT</span>
+                    <span class="brand-badge">MULTI-SESSION 50+</span>
+                </div>
+            </div>
+
+            <div class="nav-tabs">
+                <button class="nav-tab active" id="tabBtnUser" onclick="switchTab('user')">
+                    <i class="fa-solid fa-link"></i>
+                    <span>Connect Bot</span>
+                </button>
+                <button class="nav-tab" id="tabBtnAdmin" onclick="switchTab('admin')">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span>Admin Panel</span>
+                </button>
+            </div>
+
+            <div class="nav-actions">
+                <a href="/KnightBot_Commands_Manual_Azirytech.pdf" download="KnightBot_Commands_Manual_Azirytech.pdf" class="btn-tool" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.4); color: var(--primary);" title="Download Full Commands PDF Manual (Azirytech)">
+                    <i class="fa-solid fa-file-pdf"></i> Commands PDF
+                </a>
+                <div class="status-indicator">
+                    <span class="status-dot pulse"></span>
+                    <span class="status-text" id="serverStatusText">Server Online</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- App Container -->
+    <main class="main-content">
+        
+        <!-- ============================================== -->
+        <!-- TAB 1: USER PORTAL (PAIRING & BOT CONNECTION) -->
+        <!-- ============================================== -->
+        <section id="userSection" class="tab-content active">
+            <div class="hero-section">
+                <div class="hero-badge">
+                    <i class="fa-solid fa-bolt"></i> High-Speed Multi-Tenant Engine
+                </div>
+                <h1 class="hero-title">Deploy Your WhatsApp Bot <span class="gradient-text">In Seconds</span></h1>
+                <p class="hero-subtitle">Connect your personal or group WhatsApp account with an instant pairing code. Supports up to 50+ concurrent bot instances.</p>
+            </div>
+
+            <div class="connection-grid">
+                <!-- Connect Form Card -->
+                <div class="glass-card form-card">
+                    <div class="card-header">
+                        <div class="card-icon"><i class="fa-solid fa-plug"></i></div>
+                        <div>
+                            <h2>Connect New Bot</h2>
+                            <p>Choose your preferred linking method</p>
+                        </div>
+                    </div>
+
+                    <!-- Method Selector -->
+                    <div class="method-selector">
+                        <button type="button" class="method-btn active" id="btnMethodPair" onclick="selectMethod('pair')">
+                            <i class="fa-solid fa-key"></i>
+                            <span>Pairing Code</span>
+                            <span class="pill-rec">Fast</span>
+                        </button>
+                        <button type="button" class="method-btn" id="btnMethodQr" onclick="selectMethod('qr')">
+                            <i class="fa-solid fa-qrcode"></i>
+                            <span>QR Code</span>
+                        </button>
+                    </div>
+
+                    <form id="connectForm" onsubmit="handleConnect(event)">
+                        <!-- Phone Number Input (Pairing Code) -->
+                        <div class="form-group" id="phoneGroup">
+                            <label for="phoneNumber"><i class="fa-solid fa-phone"></i> WhatsApp Phone Number</label>
+                            <div class="input-wrapper">
+                                <input type="text" id="phoneNumber" placeholder="e.g. 255712345678 or 15551234567" required autocomplete="tel">
+                            </div>
+                            <span class="input-hint">Enter your full international number without + or spaces.</span>
+                        </div>
+
+                        <!-- Optional Bot Name -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="botName"><i class="fa-solid fa-tag"></i> Bot Name (Optional)</label>
+                                <input type="text" id="botName" placeholder="My Knight Bot">
+                            </div>
+                            <div class="form-group">
+                                <label for="ownerName"><i class="fa-solid fa-user-tie"></i> Owner Name (Optional)</label>
+                                <input type="text" id="ownerName" placeholder="Professor">
+                            </div>
+                        </div>
+
+                        <!-- Terms & Privacy Agreement (Mandatory: Unlocked ONLY via modal 'I Agree') -->
+                        <div class="terms-card-wrapper" id="termsCardBox">
+                            <div class="terms-card-top">
+                                <div class="terms-icon-badge">
+                                    <i class="fa-solid fa-shield-halved"></i>
+                                </div>
+                                <div class="terms-card-meta">
+                                    <h4>Terms & Privacy Protocol</h4>
+                                    <p>Mandatory security review before bot linking</p>
+                                </div>
+                                <div id="termsBadge" class="terms-pill pill-locked">
+                                    <i class="fa-solid fa-lock"></i> <span>Locked</span>
+                                </div>
+                            </div>
+
+                            <div class="terms-interactive-box" onclick="triggerTermsModal(event)" title="Click to review and unlock terms">
+                                <div class="custom-checkbox-ui" id="customCheckUi">
+                                    <div class="check-box-circle" id="checkBoxCircle">
+                                        <i class="fa-solid fa-check check-icon"></i>
+                                    </div>
+                                    <div class="check-label-text">
+                                        <span class="main-txt" id="termsMainLabel">I agree to Terms of Service, Privacy & Security Protocols</span>
+                                        <span class="sub-txt" id="termsSubLabel">Click to open &amp; accept in modal to tick this box</span>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn-review-terms" id="btnReviewTerms" onclick="openTermsModal(event)">
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i> Review Terms
+                                </button>
+                            </div>
+
+                            <!-- Hidden HTML checkbox linked to form validation -->
+                            <input type="checkbox" id="agreeTerms" style="position: absolute; opacity: 0; pointer-events: none;" required disabled>
+
+                            <div class="terms-security-footer">
+                                <div class="sec-item"><i class="fa-solid fa-lock text-emerald"></i> <span>End-to-End Encrypted</span></div>
+                                <div class="sec-item"><i class="fa-solid fa-database text-cyan"></i> <span>Zero Chat Logging</span></div>
+                                <div class="sec-item"><i class="fa-solid fa-power-off text-rose"></i> <span>Instant Disconnect</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn-primary" id="btnSubmitConnect">
+                            <span class="btn-content">
+                                <i class="fa-solid fa-paper-plane"></i>
+                                <span id="btnSubmitText">Generate Pairing Code</span>
+                            </span>
+                            <span class="btn-loader hidden" id="btnLoader"><i class="fa-solid fa-circle-notch fa-spin"></i> Initializing...</span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Live Result / Pairing Code Display Card -->
+                <div class="glass-card result-card" id="resultCard">
+                    <div class="empty-state" id="emptyState">
+                        <div class="empty-icon"><i class="fa-solid fa-satellite-dish"></i></div>
+                        <h3>Ready for Connection</h3>
+                        <p>Fill in your details on the left, accept the terms, and click generate to connect.</p>
+                        
+                        <!-- Quick Step Overview -->
+                        <div class="quick-instructions" id="quickInstructions">
+                            <div class="instr-title"><i class="fa-solid fa-circle-info"></i> How it works:</div>
+                            <div class="instr-steps">
+                                <span><i class="fa-solid fa-1"></i> Enter Phone</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                                <span><i class="fa-solid fa-2"></i> Get 8-Digit Code</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                                <span><i class="fa-solid fa-3"></i> Link in WhatsApp</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pairing Code Box -->
+                    <div class="pairing-box hidden" id="pairingBox">
+                        <div class="code-header">
+                            <span class="badge-pairing"><i class="fa-solid fa-key"></i> YOUR PAIRING CODE</span>
+                            <span class="countdown" id="pairingTimer"><i class="fa-regular fa-clock"></i> Active</span>
+                        </div>
+
+                        <div class="code-display" onclick="copyPairingCode()" title="Click to copy">
+                            <span id="displayPairingCode">---- ----</span>
+                            <button class="btn-copy" id="btnCopyCode" type="button">
+                                <i class="fa-regular fa-copy"></i>
+                            </button>
+                        </div>
+                        <p class="copy-notice" id="copyNotice">Tap the code to copy to clipboard</p>
+
+                        <!-- Step Instructions (Pairing Code) -->
+                        <div class="steps-guide">
+                            <h4><i class="fa-solid fa-mobile-screen-button"></i> 4 Simple Steps to Link via Code:</h4>
+                            <ol>
+                                <li>Open <strong>WhatsApp</strong> on your phone.</li>
+                                <li>Tap <strong>Settings (or ⋮ Menu)</strong> &gt; <strong>Linked Devices</strong>.</li>
+                                <li>Tap <strong>Link a Device</strong> &gt; Select <strong>Link with phone number instead</strong> at the bottom.</li>
+                                <li>Enter the <strong>8-digit Pairing Code</strong> shown above.</li>
+                            </ol>
+                        </div>
+
+                        <!-- Live Status Step Bar -->
+                        <div class="status-steps">
+                            <div class="step-item completed">
+                                <div class="step-dot"><i class="fa-solid fa-check"></i></div>
+                                <span>Code Generated</span>
+                            </div>
+                            <div class="step-item active" id="stepWaiting">
+                                <div class="step-dot"><i class="fa-solid fa-spinner fa-spin"></i></div>
+                                <span>Awaiting WhatsApp Link</span>
+                            </div>
+                            <div class="step-item" id="stepOnline">
+                                <div class="step-dot"><i class="fa-solid fa-circle"></i></div>
+                                <span>Bot Online</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- QR Code Box -->
+                    <div class="qr-box hidden" id="qrBox">
+                        <div class="code-header">
+                            <span class="badge-pairing"><i class="fa-solid fa-qrcode"></i> SCAN QR CODE</span>
+                        </div>
+                        <div class="qr-image-wrapper">
+                            <img id="qrImage" src="" alt="WhatsApp QR Code">
+                        </div>
+                        
+                        <!-- Step Instructions (QR Code) -->
+                        <div class="steps-guide" style="width: 100%; text-align: left;">
+                            <h4><i class="fa-solid fa-camera"></i> 3 Steps to Link via QR:</h4>
+                            <ol>
+                                <li>Open <strong>WhatsApp</strong> on your phone.</li>
+                                <li>Go to <strong>Settings</strong> &gt; <strong>Linked Devices</strong>.</li>
+                                <li>Tap <strong>Link a Device</strong> and point your camera at this QR code.</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <!-- Connected Bot Profile Card -->
+                    <div class="connected-box hidden" id="connectedBox">
+                        <div class="connected-badge">
+                            <i class="fa-solid fa-circle-check"></i> BOT CONNECTED SUCCESSFULLY
+                        </div>
+                        <div class="bot-profile">
+                            <div class="bot-avatar">
+                                <i class="fa-solid fa-robot"></i>
+                            </div>
+                            <div class="bot-details">
+                                <h3 id="connectedBotName">Knight Bot</h3>
+                                <p id="connectedBotNumber">+255 700 000 000</p>
+                                <span class="badge-online"><i class="fa-solid fa-wifi"></i> Online & Listening</span>
+                            </div>
+                        </div>
+
+                        <div class="session-stats-mini">
+                            <div class="stat-mini">
+                                <span class="lbl">Session ID</span>
+                                <span class="val" id="connectedSessionId">---</span>
+                            </div>
+                            <div class="stat-mini">
+                                <span class="lbl">Uptime</span>
+                                <span class="val" id="connectedUptime">Just now</span>
+                            </div>
+                        </div>
+
+                        <div class="connected-actions">
+                            <button class="btn-action btn-restart" onclick="restartCurrentSession()">
+                                <i class="fa-solid fa-rotate"></i> Restart
+                            </button>
+                            <button class="btn-action btn-delete" onclick="disconnectCurrentSession()">
+                                <i class="fa-solid fa-power-off"></i> Disconnect
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support Desk & FAQ Section -->
+            <div class="support-section">
+                <div class="glass-card support-card">
+                    <div class="support-header">
+                        <div class="card-icon icon-emerald"><i class="fa-solid fa-headset"></i></div>
+                        <div>
+                            <h2>Support Desk & Help Center</h2>
+                            <p>Have questions, need help setting up, or report an issue? Reach out directly to our team.</p>
+                        </div>
+                    </div>
+
+                    <div class="support-grid">
+                        <a href="https://wa.me/919876543210" target="_blank" class="support-box" id="suppWaBox">
+                            <div class="supp-icon wa"><i class="fa-brands fa-whatsapp"></i></div>
+                            <div class="supp-info">
+                                <span class="supp-title">WhatsApp Support</span>
+                                <span class="supp-val" id="suppWaText">+91 9876543210</span>
+                            </div>
+                        </a>
+
+                        <a href="mailto:support@knightbot.com" class="support-box" id="suppEmailBox">
+                            <div class="supp-icon email"><i class="fa-solid fa-envelope"></i></div>
+                            <div class="supp-info">
+                                <span class="supp-title">Email Desk</span>
+                                <span class="supp-val" id="suppEmailText">support@knightbot.com</span>
+                            </div>
+                        </a>
+
+                        <a href="https://t.me/+3QhFUZHx-nhhZmY1" target="_blank" class="support-box" id="suppTgBox">
+                            <div class="supp-icon tg"><i class="fa-brands fa-telegram"></i></div>
+                            <div class="supp-info">
+                                <span class="supp-title">Telegram Channel</span>
+                                <span class="supp-val">Join Community</span>
+                            </div>
+                        </a>
+
+                        <a href="https://whatsapp.com/channel/0029Va90zAnIHphOuO8Msp3A" target="_blank" class="support-box" id="suppChannelBox">
+                            <div class="supp-icon channel"><i class="fa-solid fa-bullhorn"></i></div>
+                            <div class="supp-info">
+                                <span class="supp-title">Official Channel</span>
+                                <span class="supp-val">Updates & News</span>
+                            </div>
+                        </a>
+                    </div>
+
+                    <!-- PDF Manual Download Banner -->
+                    <div style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.12), rgba(6, 182, 212, 0.12)); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: var(--radius-md); padding: 1.25rem 1.5rem; margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 1rem;">
+                            <div style="width: 46px; height: 46px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.35rem; color: #042f2e; box-shadow: 0 0 16px var(--primary-glow); flex-shrink: 0;">
+                                <i class="fa-solid fa-file-pdf"></i>
+                            </div>
+                            <div>
+                                <h4 style="font-size: 1.05rem; font-weight: 700; color: #ffffff; margin-bottom: 0.2rem;">Official Commands Manual (PDF)</h4>
+                                <p style="font-size: 0.82rem; color: var(--text-muted); margin: 0;">Authored & Engineered by <strong>Azirytech</strong> • Full syntax, parameters & usage examples</p>
+                            </div>
+                        </div>
+                        <a href="/KnightBot_Commands_Manual_Azirytech.pdf" download="KnightBot_Commands_Manual_Azirytech.pdf" class="btn-primary" style="padding: 0.65rem 1.25rem; font-size: 0.88rem; text-decoration: none;">
+                            <i class="fa-solid fa-download"></i> Download PDF Manual
+                        </a>
+                    </div>
+
+                    <!-- Interactive Quick FAQ -->
+                    <div class="faq-container">
+                        <h3 class="faq-title"><i class="fa-solid fa-circle-question"></i> Frequently Asked Questions</h3>
+                        <div class="faq-list">
+                            <div class="faq-item" onclick="toggleFaq(this)">
+                                <div class="faq-header">
+                                    <span><i class="fa-solid fa-shield-halved text-emerald"></i> Is my WhatsApp account and personal data safe?</span>
+                                    <i class="fa-solid fa-chevron-down faq-chevron"></i>
+                                </div>
+                                <div class="faq-body">
+                                    Yes! All communications use WhatsApp's native End-to-End Encryption. Your personal chat history, media, and private messages are never stored, logged, or forwarded to external servers.
+                                </div>
+                            </div>
+
+                            <div class="faq-item" onclick="toggleFaq(this)">
+                                <div class="faq-header">
+                                    <span><i class="fa-solid fa-power-off text-rose"></i> How can I disconnect the bot anytime?</span>
+                                    <i class="fa-solid fa-chevron-down faq-chevron"></i>
+                                </div>
+                                <div class="faq-body">
+                                    You have 100% control. You can click <strong>Disconnect</strong> in this dashboard, or open WhatsApp on your phone &gt; <strong>Settings</strong> &gt; <strong>Linked Devices</strong> &gt; Tap the device &gt; <strong>Log Out</strong>.
+                                </div>
+                            </div>
+
+                            <div class="faq-item" onclick="toggleFaq(this)">
+                                <div class="faq-header">
+                                    <span><i class="fa-solid fa-robot text-cyan"></i> What will this bot do in my WhatsApp?</span>
+                                    <i class="fa-solid fa-chevron-down faq-chevron"></i>
+                                </div>
+                                <div class="faq-body">
+                                    The bot only executes commands when you or group members trigger prefix commands (e.g. <code>.menu</code>, <code>.sticker</code>, <code>.ai</code>, <code>.song</code>, <code>.tagall</code>). It does not send unprompted spam or messages.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- TAB 2: ADMIN MANAGEMENT HUB (50+ SESSIONS)     -->
+        <!-- ============================================== -->
+        <section id="adminSection" class="tab-content">
+            
+            <!-- Admin Login Overlay if not authenticated -->
+            <div class="admin-login-card glass-card" id="adminLoginCard">
+                <div class="admin-login-header">
+                    <div class="card-icon"><i class="fa-solid fa-lock"></i></div>
+                    <h2>Admin Authentication</h2>
+                    <p>Enter administrative credentials to access the 50+ bot management console.</p>
+                </div>
+                <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
+                    <div class="form-group">
+                        <label for="adminUser"><i class="fa-solid fa-user"></i> Username</label>
+                        <input type="text" id="adminUser" placeholder="admin" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="adminPass"><i class="fa-solid fa-key"></i> Password</label>
+                        <input type="password" id="adminPass" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn-primary" id="btnAdminLogin">
+                        <i class="fa-solid fa-arrow-right-to-bracket"></i> Unlock Admin Hub
+                    </button>
+                </form>
+            </div>
+
+            <!-- Admin Dashboard Main (Shown after login) -->
+            <div id="adminDashboard" class="hidden">
+                
+                <!-- Telemetry KPI Cards -->
+                <div class="kpi-grid">
+                    <div class="glass-card kpi-card">
+                        <div class="kpi-icon icon-emerald"><i class="fa-solid fa-server"></i></div>
+                        <div class="kpi-info">
+                            <span class="kpi-label">Active Bots Online</span>
+                            <h3 class="kpi-value" id="kpiActiveBots">0</h3>
+                            <span class="kpi-sub" id="kpiTotalBots">0 Total Registered</span>
+                        </div>
+                    </div>
+
+                    <div class="glass-card kpi-card">
+                        <div class="kpi-icon icon-cyan"><i class="fa-solid fa-comments"></i></div>
+                        <div class="kpi-info">
+                            <span class="kpi-label">Processed Messages</span>
+                            <h3 class="kpi-value" id="kpiTotalMessages">0</h3>
+                            <span class="kpi-sub">Across All Sockets</span>
+                        </div>
+                    </div>
+
+                    <div class="glass-card kpi-card">
+                        <div class="kpi-icon icon-indigo"><i class="fa-solid fa-microchip"></i></div>
+                        <div class="kpi-info">
+                            <span class="kpi-label">Memory / RAM</span>
+                            <h3 class="kpi-value" id="kpiRamUsage">0 MB</h3>
+                            <span class="kpi-sub" id="kpiHeapUsage">Heap: 0 MB</span>
+                        </div>
+                    </div>
+
+                    <div class="glass-card kpi-card">
+                        <div class="kpi-icon icon-amber"><i class="fa-solid fa-clock"></i></div>
+                        <div class="kpi-info">
+                            <span class="kpi-label">Server Uptime</span>
+                            <h3 class="kpi-value" id="kpiUptime">0h 0m</h3>
+                            <span class="kpi-sub">Auto-Recovery Active</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Action Toolbar -->
+                <div class="admin-toolbar glass-card">
+                    <div class="toolbar-search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="searchSessionInput" placeholder="Search by Phone, Name, or Session ID..." oninput="filterSessionsTable()">
+                    </div>
+                    <div class="toolbar-actions">
+                        <button class="btn-tool" onclick="refreshAdminSessions()" title="Refresh list"><i class="fa-solid fa-rotate"></i> Refresh</button>
+                        <button class="btn-tool" onclick="openDirectMessageModal()" title="Send WhatsApp message from bot"><i class="fa-solid fa-paper-plane"></i> Direct Msg</button>
+                        <button class="btn-tool btn-broadcast" onclick="openBroadcastModal()" title="Send broadcast announcement"><i class="fa-solid fa-bullhorn"></i> Broadcast</button>
+                        <button class="btn-tool" onclick="handleCleanSystem()" title="Clean temp & orphan sessions"><i class="fa-solid fa-broom"></i> Clean Up</button>
+                        <button class="btn-tool" onclick="handleExportBackup()" title="Download JSON backup"><i class="fa-solid fa-download"></i> Export</button>
+                        <button class="btn-tool btn-danger-soft" onclick="handleAdminLogout()" title="Logout"><i class="fa-solid fa-arrow-right-from-bracket"></i></button>
+                    </div>
+                </div>
+
+                <!-- Sessions Management Table -->
+                <div class="glass-card table-card">
+                    <div class="card-header table-header">
+                        <div>
+                            <h2>Connected Bot Sessions</h2>
+                            <p>Live registry of all 50+ independent WhatsApp client instances</p>
+                        </div>
+                        <div class="table-filters">
+                            <button class="filter-pill active" onclick="filterByStatus('all', this)">All</button>
+                            <button class="filter-pill" onclick="filterByStatus('online', this)">Online</button>
+                            <button class="filter-pill" onclick="filterByStatus('pairing', this)">Pairing</button>
+                            <button class="filter-pill" onclick="filterByStatus('offline', this)">Offline</button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="session-table">
+                            <thead>
+                                <tr>
+                                    <th>Session ID</th>
+                                    <th>Phone / User</th>
+                                    <th>Bot Name</th>
+                                    <th>Status</th>
+                                    <th>Control</th>
+                                    <th>Pairing Code</th>
+                                    <th>Last Active</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sessionTableBody">
+                                <tr>
+                                    <td colspan="8" class="loading-cell"><i class="fa-solid fa-spinner fa-spin"></i> Loading sessions...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Live System Log Stream -->
+                <div class="glass-card logs-card">
+                    <div class="card-header">
+                        <div class="card-icon"><i class="fa-solid fa-terminal"></i></div>
+                        <div>
+                            <h2>Live System & Session Logs</h2>
+                            <p>Real-time event stream from Baileys socket handlers</p>
+                        </div>
+                    </div>
+                    <div class="terminal-logs" id="terminalLogs">
+                        <div class="log-entry log-info">[SYSTEM] Initializing telemetry log stream...</div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Global Broadcast Modal -->
+    <div class="modal-overlay hidden" id="broadcastModal">
+        <div class="modal-card glass-card">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-bullhorn"></i> Global Bot Broadcast</h3>
+                <button class="modal-close" onclick="closeBroadcastModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <p>Send an instant message announcement across all connected active WhatsApp bots simultaneously.</p>
+                <textarea id="broadcastMessage" rows="5" placeholder="Enter broadcast text here..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeBroadcastModal()">Cancel</button>
+                <button class="btn-primary" onclick="sendBroadcast()"><i class="fa-solid fa-paper-plane"></i> Send Broadcast</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Direct Message Modal -->
+    <div class="modal-overlay hidden" id="directMessageModal">
+        <div class="modal-card glass-card">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-paper-plane"></i> Send Direct WhatsApp Message</h3>
+                <button class="modal-close" onclick="closeDirectMessageModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="dmSenderSession"><i class="fa-solid fa-robot"></i> Select Sender Bot</label>
+                    <select id="dmSenderSession" class="custom-select"></select>
+                </div>
+                <div class="form-group">
+                    <label for="dmTargetNumber"><i class="fa-solid fa-phone"></i> Target Phone or Group JID</label>
+                    <input type="text" id="dmTargetNumber" placeholder="e.g. 255712345678 or 120363xxx@g.us">
+                </div>
+                <div class="form-group">
+                    <label for="dmMessageText"><i class="fa-solid fa-comment-dots"></i> Message Content</label>
+                    <textarea id="dmMessageText" rows="4" placeholder="Type your WhatsApp message here..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" onclick="closeDirectMessageModal()">Cancel</button>
+                <button class="btn-primary" onclick="handleSendDirectMessage()"><i class="fa-solid fa-paper-plane"></i> Send Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bot Config Editor Modal -->
+    <div class="modal-overlay hidden" id="configModal">
+        <div class="modal-card glass-card">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-sliders"></i> Edit Bot Configuration</h3>
+                <button class="modal-close" onclick="closeConfigModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editSessionId">
+                <div class="form-group">
+                    <label for="editBotName"><i class="fa-solid fa-robot"></i> Bot Name</label>
+                    <input type="text" id="editBotName">
+                </div>
+                <div class="form-group">
+                    <label for="editOwnerName"><i class="fa-solid fa-user-tie"></i> Owner Name</label>
+                    <input type="text" id="editOwnerName">
+                </div>
+                <div class="form-group">
+                    <label for="editOwnerNumber"><i class="fa-solid fa-phone"></i> Owner Phone Number</label>
+                    <input type="text" id="editOwnerNumber">
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="editAutoRestart">
+                        <span>Auto-Reconnect on disconnect</span>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeConfigModal()">Cancel</button>
+                <button type="button" class="btn-primary" onclick="handleSaveConfig()"><i class="fa-solid fa-floppy-disk"></i> Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Terms of Service & Security Modal -->
+    <div class="modal-overlay hidden" id="termsModal">
+        <div class="modal-card modal-card-lg glass-card">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-shield-halved"></i> Terms of Service & Data Security Protocol</h3>
+                <button class="modal-close" onclick="closeTermsModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="modal-body terms-modal-body">
+                <!-- Security Guarantee Banner -->
+                <div class="terms-security-banner">
+                    <div class="banner-icon"><i class="fa-solid fa-lock"></i></div>
+                    <div class="banner-info">
+                        <h4>End-to-End Encrypted & Private</h4>
+                        <p>Knight Bot runs direct WhatsApp Baileys protocol with strict zero-knowledge chat isolation.</p>
+                    </div>
+                </div>
+
+                <!-- 4 Pillar Breakdown -->
+                <div class="terms-pillar-grid">
+                    <div class="pillar-card">
+                        <div class="pillar-icon text-emerald"><i class="fa-solid fa-user-shield"></i></div>
+                        <h5>1. Data Privacy & Storage</h5>
+                        <p>We <strong>never</strong> log, read, store, or sell your private conversations, media, or contact lists. Auth tokens are stored in an isolated, encrypted local sandbox.</p>
+                    </div>
+
+                    <div class="pillar-card">
+                        <div class="pillar-icon text-cyan"><i class="fa-solid fa-robot"></i></div>
+                        <h5>2. What the Bot Does</h5>
+                        <p>The bot only responds when triggered by explicit commands (e.g. <code>.menu</code>, <code>.sticker</code>, <code>.ai</code>, <code>.song</code>, <code>.tagall</code>). It does not send random or unprompted messages.</p>
+                    </div>
+
+                    <div class="pillar-card">
+                        <div class="pillar-icon text-amber"><i class="fa-solid fa-scale-balanced"></i></div>
+                        <h5>3. Terms of Service</h5>
+                        <p>You agree to use the bot responsibly and ethically. Using the bot for malicious spamming, bulk harassment, or unlawful content is strictly prohibited.</p>
+                    </div>
+
+                    <div class="pillar-card">
+                        <div class="pillar-icon text-rose"><i class="fa-solid fa-power-off"></i></div>
+                        <h5>4. Instant Revocation</h5>
+                        <p>You can disconnect the bot at any second by clicking <strong>Disconnect</strong> on this dashboard or directly in your WhatsApp phone app via <strong>Linked Devices &gt; Log Out</strong>.</p>
+                    </div>
+                </div>
+
+                <!-- Deep Details Accordion -->
+                <div class="terms-details-box">
+                    <h4><i class="fa-solid fa-circle-check text-emerald"></i> Your Safety Guarantees</h4>
+                    <ul>
+                        <li><i class="fa-solid fa-check text-emerald"></i> <strong>Official WhatsApp Web Protocol:</strong> Connects using WhatsApp's multi-device web socket engine.</li>
+                        <li><i class="fa-solid fa-check text-emerald"></i> <strong>Zero Third-Party Sharing:</strong> No telemetry is forwarded to third-party ad networks or external tracking databases.</li>
+                        <li><i class="fa-solid fa-check text-emerald"></i> <strong>Full User Control:</strong> You can pause the bot or edit its configuration at any time.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeTermsModal()">Close</button>
+                <button type="button" class="btn-primary" onclick="acceptTermsAndClose()">
+                    <i class="fa-solid fa-check-double"></i> I Accept & Agree to Terms
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Script -->
+    <script src="/js/app.js"></script>
+</body>
+</html>

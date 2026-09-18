@@ -1,0 +1,1484 @@
+const fs = require('fs');
+const path = require('path');
+const { execSync } = require('child_process');
+
+function generateManual() {
+    console.log('Generating Azirytech KnightBot-MD Command Reference Manual...');
+
+    const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>KnightBot MD - Official Command Reference Manual | Azirytech</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        @page {
+            size: A4;
+            margin: 14mm 12mm 14mm 12mm;
+            @bottom-right {
+                content: counter(page);
+            }
+        }
+
+        :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --primary-glow: rgba(16, 185, 129, 0.15);
+            --cyan: #06b6d4;
+            --indigo: #6366f1;
+            --amber: #f59e0b;
+            --rose: #f43f5e;
+            --bg-dark: #0b0f19;
+            --bg-card: #111827;
+            --bg-subcard: #1f2937;
+            --text-main: #f9fafb;
+            --text-muted: #9ca3af;
+            --text-dim: #6b7280;
+            --border: #374151;
+            --border-light: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #0b0f19;
+            color: var(--text-main);
+            line-height: 1.5;
+            font-size: 9.5pt;
+        }
+
+        .page-break {
+            page-break-before: always;
+        }
+
+        .avoid-break {
+            page-break-inside: avoid;
+        }
+
+        /* ==============================================
+           COVER PAGE
+           ============================================== */
+        .cover-page {
+            height: 260mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20mm 15mm;
+            background: linear-gradient(135deg, #0b0f19 0%, #111827 50%, #06181f 100%);
+            border: 2px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            page-break-after: always;
+        }
+
+        .cover-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 15px;
+        }
+
+        .brand-badge {
+            font-size: 13pt;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: var(--primary);
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand-tagline {
+            font-size: 8.5pt;
+            color: var(--cyan);
+            font-weight: 600;
+            background: rgba(6, 182, 212, 0.1);
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(6, 182, 212, 0.3);
+        }
+
+        .cover-hero {
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        .cover-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, var(--primary), var(--cyan));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32pt;
+            color: #042f2e;
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
+        }
+
+        .cover-title {
+            font-size: 34pt;
+            font-weight: 900;
+            letter-spacing: -1px;
+            line-height: 1.1;
+            margin-bottom: 12px;
+            color: #ffffff;
+        }
+
+        .cover-title span {
+            background: linear-gradient(135deg, #10b981, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cover-subtitle {
+            font-size: 14pt;
+            color: var(--text-muted);
+            font-weight: 500;
+            max-width: 500px;
+            margin: 0 auto 25px;
+        }
+
+        .cover-pills {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .cover-pill {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 8.5pt;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .cover-pill.highlight {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .cover-footer {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .footer-brand-name {
+            font-size: 11pt;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: 0.5px;
+        }
+
+        .footer-brand-sub {
+            font-size: 8pt;
+            color: var(--text-dim);
+        }
+
+        .footer-meta {
+            text-align: right;
+            font-size: 8pt;
+            color: var(--text-muted);
+        }
+
+        /* ==============================================
+           DOCUMENT HEADER & SECTION STYLES
+           ============================================== */
+        .doc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(16, 185, 129, 0.3);
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+        }
+
+        .doc-header-title {
+            font-size: 10pt;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .doc-header-brand {
+            font-size: 8.5pt;
+            font-weight: 600;
+            color: var(--cyan);
+        }
+
+        .section-banner {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(6, 182, 212, 0.1));
+            border-left: 4px solid var(--primary);
+            border-radius: 0 8px 8px 0;
+            padding: 10px 14px;
+            margin: 18px 0 12px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title {
+            font-size: 13pt;
+            font-weight: 800;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-count {
+            font-size: 8pt;
+            font-weight: 700;
+            background: rgba(16, 185, 129, 0.25);
+            color: var(--primary);
+            padding: 3px 8px;
+            border-radius: 12px;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+        }
+
+        /* ==============================================
+           TABLE STYLING
+           ============================================== */
+        .cmd-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 16px;
+            font-size: 8.8pt;
+            background: var(--bg-card);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .cmd-table th {
+            background: #1f2937;
+            color: #f3f4f6;
+            font-weight: 700;
+            text-align: left;
+            padding: 8px 10px;
+            border-bottom: 2px solid var(--border);
+            font-size: 8pt;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .cmd-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            vertical-align: top;
+        }
+
+        .cmd-table tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.015);
+        }
+
+        .cmd-code {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            color: var(--primary);
+            background: rgba(16, 185, 129, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            white-space: nowrap;
+            display: inline-block;
+        }
+
+        .cmd-syntax {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 8pt;
+            color: var(--cyan);
+            background: rgba(6, 182, 212, 0.08);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            display: inline-block;
+            margin-top: 3px;
+        }
+
+        .cmd-desc {
+            color: #d1d5db;
+            font-size: 8.6pt;
+            line-height: 1.4;
+        }
+
+        .cmd-example {
+            font-size: 7.8pt;
+            color: var(--text-dim);
+            font-style: italic;
+            margin-top: 2px;
+        }
+
+        .badge-perm {
+            font-size: 7pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 2px 6px;
+            border-radius: 4px;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            display: inline-block;
+        }
+
+        .perm-all {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--primary);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .perm-admin {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--amber);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .perm-owner {
+            background: rgba(244, 63, 94, 0.15);
+            color: var(--rose);
+            border: 1px solid rgba(244, 63, 94, 0.3);
+        }
+
+        /* ==============================================
+           CALLOUT & INFO BOXES
+           ============================================== */
+        .info-card {
+            background: rgba(17, 24, 39, 0.8);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--cyan);
+            border-radius: 0 8px 8px 0;
+            padding: 12px 14px;
+            margin: 14px 0;
+            font-size: 8.8pt;
+        }
+
+        .info-card h4 {
+            color: var(--cyan);
+            font-weight: 700;
+            margin-bottom: 4px;
+            font-size: 9.5pt;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 12px 0;
+        }
+
+        .feature-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px 12px;
+        }
+
+        .feature-box h5 {
+            font-size: 9pt;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 3px;
+        }
+
+        .feature-box p {
+            font-size: 8.2pt;
+            color: var(--text-muted);
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==============================================
+         COVER PAGE
+         ============================================== -->
+    <div class="cover-page">
+        <div class="cover-top">
+            <div class="brand-badge">🛡️ AZIRYTECH</div>
+            <div class="brand-tagline">OFFICIAL BOT MANUAL 2026</div>
+        </div>
+
+        <div class="cover-hero">
+            <div class="cover-icon">⚡</div>
+            <h1 class="cover-title">KNIGHTBOT-MD<br><span>COMMAND GUIDE</span></h1>
+            <p class="cover-subtitle">Comprehensive Technical Operations Manual, Command Syntax, and Multi-Session Platform Reference.</p>
+
+            <div class="cover-pills">
+                <span class="cover-pill highlight">✨ 100+ Active Commands</span>
+                <span class="cover-pill">🚀 Multi-Session 50+ Sockets</span>
+                <span class="cover-pill">🔒 End-to-End Encrypted</span>
+                <span class="cover-pill">🤖 AI & Media Engine</span>
+            </div>
+        </div>
+
+        <div class="cover-footer">
+            <div class="footer-brand">
+                <span class="footer-brand-name">AZIRYTECH ENTERPRISE</span>
+                <span class="footer-brand-sub">Software Development & WhatsApp Automation Solutions</span>
+            </div>
+            <div class="footer-meta">
+                <div><strong>Version:</strong> 3.0.7 MD</div>
+                <div><strong>Support:</strong> support@knightbot.com</div>
+                <div><strong>Release:</strong> September 2026</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==============================================
+         TABLE OF CONTENTS & SYSTEM OVERVIEW
+         ============================================== -->
+    <div class="doc-header">
+        <span class="doc-header-title">System Architecture & Overview</span>
+        <span class="doc-header-brand">Azirytech Documentation</span>
+    </div>
+
+    <div class="info-card">
+        <h4>⚡ About KnightBot Multi-Session Engine</h4>
+        <p>KnightBot-MD is a state-of-the-art multi-tenant WhatsApp bot framework powered by Baileys. It allows connecting and managing <strong>50+ independent concurrent WhatsApp sessions</strong> simultaneously with isolated encrypted credential stores, real-time telemetry, and automated anti-ban protections.</p>
+    </div>
+
+    <div class="grid-2">
+        <div class="feature-box">
+            <h5>📱 Method 1: Pairing Code Linking</h5>
+            <p>Enter your international phone number in the dashboard to receive an instant 8-digit verification code. Link directly via <em>WhatsApp > Linked Devices > Link with phone number</em>.</p>
+        </div>
+        <div class="feature-box">
+            <h5>📷 Method 2: QR Code Scanning</h5>
+            <p>Generate a high-resolution dynamic QR code on the dashboard and scan it in seconds with your phone camera.</p>
+        </div>
+        <div class="feature-box">
+            <h5>🛡️ Privacy & Zero Logging</h5>
+            <p>Direct Noise-protocol socket encryption. Chat logs, media, and private contacts are never stored or forwarded to third-party servers.</p>
+        </div>
+        <div class="feature-box">
+            <h5>🔌 1-Click Instant Disconnect</h5>
+            <p>Revoke bot access anytime directly from the Web Dashboard or in the WhatsApp app (*Linked Devices > Log Out*).</p>
+        </div>
+    </div>
+
+    <!-- ==============================================
+         SECTION 1: GENERAL & UTILITY COMMANDS
+         ============================================== -->
+    <div class="section-banner">
+        <div class="section-title">🌐 1. General & Utility Commands</div>
+        <span class="section-count">18 Commands</span>
+    </div>
+
+    <table class="cmd-table">
+        <thead>
+            <tr>
+                <th style="width: 20%;">Command</th>
+                <th style="width: 25%;">Syntax</th>
+                <th style="width: 12%;">Access</th>
+                <th style="width: 43%;">Description & Example</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="cmd-code">.help / .menu</span></td>
+                <td><span class="cmd-syntax">.help</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Displays the comprehensive bot command dashboard and feature list.<div class="cmd-example">Example: .menu</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.ping</span></td>
+                <td><span class="cmd-syntax">.ping</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Measures response latency and verifies active socket connection speed.<div class="cmd-example">Example: .ping (Returns response time in ms)</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.alive</span></td>
+                <td><span class="cmd-syntax">.alive</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Returns bot operational uptime, active version, and server health status.<div class="cmd-example">Example: .alive</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.tts</span></td>
+                <td><span class="cmd-syntax">.tts &lt;text&gt;</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Converts written text into high-fidelity voice audio note.<div class="cmd-example">Example: .tts Welcome to Azirytech Services</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.trt / .translate</span></td>
+                <td><span class="cmd-syntax">.trt &lt;text&gt; &lt;lang&gt;</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Translates text into any language (sw, en, es, fr, ar, hi, etc.).<div class="cmd-example">Example: .trt Hello friend sw</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.weather</span></td>
+                <td><span class="cmd-syntax">.weather &lt;city&gt;</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Fetches live meteorological data, temperature, humidity, and forecast.<div class="cmd-example">Example: .weather Dar es Salaam</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.news</span></td>
+                <td><span class="cmd-syntax">.news</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Fetches current global top trending news headlines.<div class="cmd-example">Example: .news</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.lyrics</span></td>
+                <td><span class="cmd-syntax">.lyrics &lt;title&gt;</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Searches and retrieves full song lyrics.<div class="cmd-example">Example: .lyrics Shape of You</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.8ball</span></td>
+                <td><span class="cmd-syntax">.8ball &lt;question&gt;</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Delivers a random mystical prediction to any yes/no question.<div class="cmd-example">Example: .8ball Will we succeed today?</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.joke</span></td>
+                <td><span class="cmd-syntax">.joke</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Generates a clean, humorous random joke.<div class="cmd-example">Example: .joke</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.quote</span></td>
+                <td><span class="cmd-syntax">.quote</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Displays an inspiring quote from renowned historical figures.<div class="cmd-example">Example: .quote</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.fact</span></td>
+                <td><span class="cmd-syntax">.fact</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Provides a verified fascinating fact about science, nature, or history.<div class="cmd-example">Example: .fact</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.attp</span></td>
+                <td><span class="cmd-syntax">.attp &lt;text&gt;</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Generates an animated flashing multi-color text sticker.<div class="cmd-example">Example: .attp Azirytech</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.ss</span></td>
+                <td><span class="cmd-syntax">.ss &lt;url&gt;</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Captures a full high-resolution screenshot of any webpage.<div class="cmd-example">Example: .ss https://google.com</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.url</span></td>
+                <td><span class="cmd-syntax">.url (reply to media)</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Uploads image/video to cloud CDN and returns a permanent link.<div class="cmd-example">Example: Reply to image with .url</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.vv / .viewonce</span></td>
+                <td><span class="cmd-syntax">.vv (reply to viewonce)</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Converts ephemeral View-Once photos/videos into normal permanent media.<div class="cmd-example">Example: Reply to view-once media with .vv</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.jid</span></td>
+                <td><span class="cmd-syntax">.jid</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Displays the exact WhatsApp user/group identifier (JID).<div class="cmd-example">Example: .jid</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.owner</span></td>
+                <td><span class="cmd-syntax">.owner</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Sends the official vCard contact of the bot administrator.<div class="cmd-example">Example: .owner</div></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- ==============================================
+         SECTION 2: GROUP ADMINISTRATION
+         ============================================== -->
+    <div class="page-break"></div>
+    <div class="doc-header">
+        <span class="doc-header-title">Group Administration & Moderation</span>
+        <span class="doc-header-brand">Azirytech Documentation</span>
+    </div>
+
+    <div class="section-banner">
+        <div class="section-title">👮‍♂️ 2. Group Admin & Moderation Commands</div>
+        <span class="section-count">24 Commands</span>
+    </div>
+
+    <table class="cmd-table">
+        <thead>
+            <tr>
+                <th style="width: 20%;">Command</th>
+                <th style="width: 25%;">Syntax</th>
+                <th style="width: 12%;">Access</th>
+                <th style="width: 43%;">Description & Example</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="cmd-code">.kick</span></td>
+                <td><span class="cmd-syntax">.kick @user</span></td>
+                <td><span class="badge-perm perm-admin">Admin</span></td>
+                <td class="cmd-desc">Instantly removes a specified member from the group.<div class="cmd-example">Example: .kick @255712345678</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.promote</span></td>
+                <td><span class="cmd-syntax">.promote @user</span></td>
+                <td><span class="badge-perm perm-admin">Admin</span></td>
+                <td class="cmd-desc">Promotes a standard member to group administrator.<div class="cmd-example">Example: .promote @user</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.demote</span></td>
+                <td><span class="cmd-syntax">.demote @user</span></td>
+                <td><span class="badge-perm perm-admin">Admin</span></td>
+                <td class="cmd-desc">Revokes administrator privileges from a group admin.<div class="cmd-example">Example: .demote @user</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.mute</span></td>
+                <td><span class="cmd-syntax">.mute [minutes]</span></td>
+                <td><span class="badge-perm perm-admin">Admin</span></td>
+                <td class="cmd-desc">Closes the group so only admins can send messages. Supports auto-timer.<div class="cmd-example">Example: .mute 30 (Mutes group for 30 mins)</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.unmute</span></td>
+                <td><span class="cmd-syntax">.unmute</span></td>
+                <td><span class="badge-perm perm-admin">Admin</span></td>
+                <td class="cmd-desc">Re-opens group messaging permissions for all participants.<div class="cmd-example">Example: .unmute</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.delete / .del</span></td>
+                <td><span class="cmd-syntax">.del (reply to msg)</span></td>
+                <td><span class="badge-perm perm-admin">Admin</span></td>
+                <td class="cmd-desc">Deletes any spam or inappropriate message in the group.<div class="cmd-example">Example: Reply to spam message with .del</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.warn</span></td>
+                <td><span class="cmd-syntax">.warn @user</span></td>
+                <td><span class="badge-perm perm-admin">Admin</span></td>
+                <td class="cmd-desc">Adds a warning strike to a member. Reaching 3 strikes auto-kicks user.<div class="cmd-example">Example: .warn @user Rule violation</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.warnings</span></td>
+                <td><span class="cmd-syntax">.warnings @user</span></td>
+                <td><span class="badge-perm perm-admin">Admin</span></td>
+                <td class="cmd-desc">Checks total warning strikes accumulated by a member.<div class="cmd-example">Example: .warnings @user</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.ban</span></td>
+                <td><span class="cmd-syntax">.ban @user</span></td>
+                <td><span class="badge-perm perm-admin">Admin</span></td>
+                <td class="cmd-desc">Blocks a user from executing any bot commands globally.<div class="cmd-example">Example: .ban @user</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.unban</span></td>
+                <td><span class="cmd-syntax">.unban @user</span></td>
+                <td><span class="badge-perm perm-admin">Admin</span></td>
+                <td class="cmd-desc">Restores command execution access for a banned user.<div class="cmd-example">Example: .unban @user</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.tagall</span></td>
+                <td><span class="cmd-syntax">.tagall &lt;announcement&gt;</span></td>
+                <td><span class="badge-perm perm-admin">Admin</span></td>
+                <td class="cmd-desc">Tags all participants in the group with an announcement banner.<div class="cmd-example">Example: .tagall Meeting starts now!</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.hidetag</span></td>
+                <td><span class="cmd-syntax">.hidetag &lt;message&gt;</span></td>
+                <td><span class="badge-perm perm-admin">Admin</span></td>
+                <td class="cmd-desc">Invisibly tags every group member without listing phone numbers.<div class="cmd-example">Example: .hidetag Urgent notice</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.tag</span></td>
+                <td><span class="cmd-syntax">.tag &lt;text&gt;</span></td>
+                <td><span class="badge-perm perm-admin">Admin</span></td>
+                <td class="cmd-desc">Mentions group members with customized formatting.<div class="cmd-example">Example: .tag Good morning all</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.tagnotadmin</span></td>
+                <td><span class="cmd-syntax">.tagnotadmin</span></td>
+                <td><span class="badge-perm perm-admin">Admin</span></td>
+                <td class="cmd-desc">Tags all non-admin regular members.<div class="cmd-example">Example: .tagnotadmin</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.antilink</span></td>
+                <td><span class="cmd-syntax">.antilink &lt;on/off&gt;</span></td>
+                <td><span class="badge-perm perm-admin">Admin</span></td>
+                <td class="cmd-desc">Auto-detects and deletes external invite links, removing spammers.<div class="cmd-example">Example: .antilink on</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.antibadword</span></td>
+                <td><span class="cmd-syntax">.antibadword &lt;on/off&gt;</span></td>
+                <td><span class="badge-perm perm-admin">Admin</span></td>
+                <td class="cmd-desc">Filters offensive/vulgar language and deletes matching messages.<div class="cmd-example">Example: .antibadword on</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.antitag</span></td>
+                <td><span class="cmd-syntax">.antitag &lt;on/off&gt;</span></td>
+                <td><span class="badge-perm perm-admin">Admin</span></td>
+                <td class="cmd-desc">Blocks non-admin participants from mass-mentioning group members.<div class="cmd-example">Example: .antitag on</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.welcome</span></td>
+                <td><span class="cmd-syntax">.welcome &lt;on/off&gt;</span></td>
+                <td><span class="badge-perm perm-admin">Admin</span></td>
+                <td class="cmd-desc">Enables automated welcome banners when new members join.<div class="cmd-example">Example: .welcome on</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.goodbye</span></td>
+                <td><span class="cmd-syntax">.goodbye &lt;on/off&gt;</span></td>
+                <td><span class="badge-perm perm-admin">Admin</span></td>
+                <td class="cmd-desc">Enables automated departure notices when a participant leaves.<div class="cmd-example">Example: .goodbye on</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.resetlink</span></td>
+                <td><span class="cmd-syntax">.resetlink</span></td>
+                <td><span class="badge-perm perm-admin">Admin</span></td>
+                <td class="cmd-desc">Revokes the current group invite link and creates a new one.<div class="cmd-example">Example: .resetlink</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.groupinfo</span></td>
+                <td><span class="cmd-syntax">.groupinfo</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Displays group creation timestamp, member count, and admin roster.<div class="cmd-example">Example: .groupinfo</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.staff / .admins</span></td>
+                <td><span class="cmd-syntax">.staff</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Lists all appointed administrators in the current group.<div class="cmd-example">Example: .staff</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.topmembers</span></td>
+                <td><span class="cmd-syntax">.topmembers</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Ranks the most active chat participants in the group.<div class="cmd-example">Example: .topmembers</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.setgname</span></td>
+                <td><span class="cmd-syntax">.setgname &lt;name&gt;</span></td>
+                <td><span class="badge-perm perm-admin">Admin</span></td>
+                <td class="cmd-desc">Modifies the group subject title.<div class="cmd-example">Example: .setgname Azirytech Developers</div></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- ==============================================
+         SECTION 3: BOT OWNER & SYSTEM CONTROL
+         ============================================== -->
+    <div class="page-break"></div>
+    <div class="doc-header">
+        <span class="doc-header-title">Bot Owner & System Configuration</span>
+        <span class="doc-header-brand">Azirytech Documentation</span>
+    </div>
+
+    <div class="section-banner">
+        <div class="section-title">🔒 3. Bot Owner & Server Control Commands</div>
+        <span class="section-count">16 Commands</span>
+    </div>
+
+    <table class="cmd-table">
+        <thead>
+            <tr>
+                <th style="width: 20%;">Command</th>
+                <th style="width: 25%;">Syntax</th>
+                <th style="width: 12%;">Access</th>
+                <th style="width: 43%;">Description & Example</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="cmd-code">.mode</span></td>
+                <td><span class="cmd-syntax">.mode &lt;public/private&gt;</span></td>
+                <td><span class="badge-perm perm-owner">Owner</span></td>
+                <td class="cmd-desc">Switches bot access between public (everyone) and private (owner only).<div class="cmd-example">Example: .mode public</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.antidelete</span></td>
+                <td><span class="cmd-syntax">.antidelete &lt;on/off&gt;</span></td>
+                <td><span class="badge-perm perm-owner">Owner</span></td>
+                <td class="cmd-desc">Intercepts revoked/deleted messages and forwards content to owner DM.<div class="cmd-example">Example: .antidelete on</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.anticall</span></td>
+                <td><span class="cmd-syntax">.anticall &lt;on/off&gt;</span></td>
+                <td><span class="badge-perm perm-owner">Owner</span></td>
+                <td class="cmd-desc">Automatically declines incoming audio and video WhatsApp calls.<div class="cmd-example">Example: .anticall on</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.autostatus</span></td>
+                <td><span class="cmd-syntax">.autostatus &lt;on/off&gt;</span></td>
+                <td><span class="badge-perm perm-owner">Owner</span></td>
+                <td class="cmd-desc">Automatically reads and views incoming contact status updates.<div class="cmd-example">Example: .autostatus on</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.autotyping</span></td>
+                <td><span class="cmd-syntax">.autotyping &lt;on/off&gt;</span></td>
+                <td><span class="badge-perm perm-owner">Owner</span></td>
+                <td class="cmd-desc">Displays permanent "typing..." presence indicator in chats.<div class="cmd-example">Example: .autotyping on</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.autoread</span></td>
+                <td><span class="cmd-syntax">.autoread &lt;on/off&gt;</span></td>
+                <td><span class="badge-perm perm-owner">Owner</span></td>
+                <td class="cmd-desc">Automatically marks incoming messages as read (blue checkmarks).<div class="cmd-example">Example: .autoread on</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.autoreact</span></td>
+                <td><span class="cmd-syntax">.autoreact &lt;on/off&gt;</span></td>
+                <td><span class="badge-perm perm-owner">Owner</span></td>
+                <td class="cmd-desc">Automatically reacts to incoming messages with expressive emojis.<div class="cmd-example">Example: .autoreact on</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.pmblocker</span></td>
+                <td><span class="cmd-syntax">.pmblocker &lt;on/off&gt;</span></td>
+                <td><span class="badge-perm perm-owner">Owner</span></td>
+                <td class="cmd-desc">Restricts bot usage to groups, blocking unsolicited private messages.<div class="cmd-example">Example: .pmblocker on</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.chatbot</span></td>
+                <td><span class="cmd-syntax">.chatbot &lt;on/off&gt;</span></td>
+                <td><span class="badge-perm perm-owner">Owner</span></td>
+                <td class="cmd-desc">Enables automated AI conversation engine for natural chat replies.<div class="cmd-example">Example: .chatbot on</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.clearsession</span></td>
+                <td><span class="cmd-syntax">.clearsession</span></td>
+                <td><span class="badge-perm perm-owner">Owner</span></td>
+                <td class="cmd-desc">Cleans orphan socket files and stale signal credentials.<div class="cmd-example">Example: .clearsession</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.cleartmp</span></td>
+                <td><span class="cmd-syntax">.cleartmp</span></td>
+                <td><span class="badge-perm perm-owner">Owner</span></td>
+                <td class="cmd-desc">Purges temporary media cache and downloads to free server storage.<div class="cmd-example">Example: .cleartmp</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.update</span></td>
+                <td><span class="cmd-syntax">.update</span></td>
+                <td><span class="badge-perm perm-owner">Owner</span></td>
+                <td class="cmd-desc">Pulls and compiles the latest bot update from the GitHub repository.<div class="cmd-example">Example: .update</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.settings</span></td>
+                <td><span class="cmd-syntax">.settings</span></td>
+                <td><span class="badge-perm perm-owner">Owner</span></td>
+                <td class="cmd-desc">Displays real-time system configuration parameters and active flags.<div class="cmd-example">Example: .settings</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.setpp</span></td>
+                <td><span class="cmd-syntax">.setpp (reply to img)</span></td>
+                <td><span class="badge-perm perm-owner">Owner</span></td>
+                <td class="cmd-desc">Changes the bot's WhatsApp profile picture.<div class="cmd-example">Example: Reply to image with .setpp</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.mention</span></td>
+                <td><span class="cmd-syntax">.mention &lt;on/off&gt;</span></td>
+                <td><span class="badge-perm perm-owner">Owner</span></td>
+                <td class="cmd-desc">Enables automatic audio/sticker replies whenever the bot owner is tagged.<div class="cmd-example">Example: .mention on</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.sudo</span></td>
+                <td><span class="cmd-syntax">.sudo &lt;add/del&gt; @user</span></td>
+                <td><span class="badge-perm perm-owner">Owner</span></td>
+                <td class="cmd-desc">Grants or revokes secondary bot owner access permissions.<div class="cmd-example">Example: .sudo add @user</div></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- ==============================================
+         SECTION 4: AI & IMAGE GENERATION
+         ============================================== -->
+    <div class="section-banner">
+        <div class="section-title">🤖 4. AI Intelligence & Image Generation</div>
+        <span class="section-count">6 Commands</span>
+    </div>
+
+    <table class="cmd-table">
+        <thead>
+            <tr>
+                <th style="width: 20%;">Command</th>
+                <th style="width: 25%;">Syntax</th>
+                <th style="width: 12%;">Access</th>
+                <th style="width: 43%;">Description & Example</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="cmd-code">.ai / .gpt</span></td>
+                <td><span class="cmd-syntax">.ai &lt;question&gt;</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Answers any question, debugs code, or writes essays using ChatGPT.<div class="cmd-example">Example: .ai Write a JavaScript function for quicksort</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.gemini</span></td>
+                <td><span class="cmd-syntax">.gemini &lt;prompt&gt;</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Leverages Google Gemini AI for advanced multi-turn reasoning.<div class="cmd-example">Example: .gemini Explain quantum computing simply</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.imagine</span></td>
+                <td><span class="cmd-syntax">.imagine &lt;prompt&gt;</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Generates high-definition artwork from creative text descriptions.<div class="cmd-example">Example: .imagine Futuristic cyberpunk city with neon lights</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.flux</span></td>
+                <td><span class="cmd-syntax">.flux &lt;prompt&gt;</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Generates ultra-photorealistic portraits with advanced FLUX diffusion.<div class="cmd-example">Example: .flux Cybernetic lion in golden armor 8k</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.sora</span></td>
+                <td><span class="cmd-syntax">.sora &lt;prompt&gt;</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Generates hyper-realistic conceptual visual graphics.<div class="cmd-example">Example: .sora Deep ocean glowing crystal reef</div></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- ==============================================
+         SECTION 5: SOCIAL MEDIA & MEDIA DOWNLOADERS
+         ============================================== -->
+    <div class="page-break"></div>
+    <div class="doc-header">
+        <span class="doc-header-title">Media Downloaders & Social Tools</span>
+        <span class="doc-header-brand">Azirytech Documentation</span>
+    </div>
+
+    <div class="section-banner">
+        <div class="section-title">📥 5. Media & Social Media Downloaders</div>
+        <span class="section-count">8 Commands</span>
+    </div>
+
+    <table class="cmd-table">
+        <thead>
+            <tr>
+                <th style="width: 20%;">Command</th>
+                <th style="width: 25%;">Syntax</th>
+                <th style="width: 12%;">Access</th>
+                <th style="width: 43%;">Description & Example</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="cmd-code">.song / .play</span></td>
+                <td><span class="cmd-syntax">.song &lt;title&gt;</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Searches YouTube and downloads high-bitrate MP3 audio with album art.<div class="cmd-example">Example: .song Perfect Ed Sheeran</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.video / .ytmp4</span></td>
+                <td><span class="cmd-syntax">.video &lt;title or link&gt;</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Downloads crisp 720p/1080p MP4 video from YouTube.<div class="cmd-example">Example: .video Alan Walker Faded</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.spotify</span></td>
+                <td><span class="cmd-syntax">.spotify &lt;track query&gt;</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Searches Spotify database and extracts full audio track.<div class="cmd-example">Example: .spotify Starboy The Weeknd</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.instagram / .ig</span></td>
+                <td><span class="cmd-syntax">.instagram &lt;link&gt;</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Downloads Instagram Reels, Posts, Videos, and Carousel Photos.<div class="cmd-example">Example: .instagram https://instagram.com/reel/xyz</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.tiktok</span></td>
+                <td><span class="cmd-syntax">.tiktok &lt;link&gt;</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Extracts TikTok videos in HD without any watermark.<div class="cmd-example">Example: .tiktok https://vm.tiktok.com/xyz</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.facebook / .fb</span></td>
+                <td><span class="cmd-syntax">.facebook &lt;link&gt;</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Downloads public Facebook video clips and reels in high resolution.<div class="cmd-example">Example: .facebook https://fb.watch/xyz</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.igs</span></td>
+                <td><span class="cmd-syntax">.igs &lt;username or link&gt;</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Downloads live Instagram Stories.<div class="cmd-example">Example: .igs https://instagram.com/stories/xyz</div></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- ==============================================
+         SECTION 6: STICKER STUDIO & IMAGE TOOLS
+         ============================================== -->
+    <div class="section-banner">
+        <div class="section-title">🎨 6. Sticker Studio & Graphic Transformation</div>
+        <span class="section-count">10 Commands</span>
+    </div>
+
+    <table class="cmd-table">
+        <thead>
+            <tr>
+                <th style="width: 20%;">Command</th>
+                <th style="width: 25%;">Syntax</th>
+                <th style="width: 12%;">Access</th>
+                <th style="width: 43%;">Description & Example</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="cmd-code">.sticker / .s</span></td>
+                <td><span class="cmd-syntax">.s (reply to img/video)</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Converts static image or short GIF/video into a WhatsApp sticker.<div class="cmd-example">Example: Reply to image with .s</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.crop</span></td>
+                <td><span class="cmd-syntax">.crop (reply to image)</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Crops any aspect ratio image into a perfect 1:1 square sticker.<div class="cmd-example">Example: Reply to portrait image with .crop</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.simage</span></td>
+                <td><span class="cmd-syntax">.simage (reply sticker)</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Converts a WhatsApp sticker back into a standard JPG photo.<div class="cmd-example">Example: Reply to sticker with .simage</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.tgsticker</span></td>
+                <td><span class="cmd-syntax">.tgsticker &lt;link&gt;</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Converts an entire Telegram sticker pack into WhatsApp stickers.<div class="cmd-example">Example: .tgsticker https://t.me/addstickers/pepe</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.take</span></td>
+                <td><span class="cmd-syntax">.take &lt;pack&gt; | &lt;author&gt;</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Changes sticker author name and pack branding metadata.<div class="cmd-example">Example: Reply with .take Azirytech | KnightBot</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.removebg</span></td>
+                <td><span class="cmd-syntax">.removebg (reply image)</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Removes the photo background, rendering a transparent PNG.<div class="cmd-example">Example: Reply to image with .removebg</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.remini</span></td>
+                <td><span class="cmd-syntax">.remini (reply image)</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">AI upscales blurry or low-resolution images into crisp HD.<div class="cmd-example">Example: Reply to photo with .remini</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.emojimix</span></td>
+                <td><span class="cmd-syntax">.emojimix 😎+🔥</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Blends two emojis together into a custom merged sticker.<div class="cmd-example">Example: .emojimix 😭+❤️</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.blur</span></td>
+                <td><span class="cmd-syntax">.blur (reply image)</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Applies an aesthetic Gaussian blur filter to an image.<div class="cmd-example">Example: Reply to image with .blur</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.meme</span></td>
+                <td><span class="cmd-syntax">.meme</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Fetches a fresh, hilarious meme from Reddit/Twitter.<div class="cmd-example">Example: .meme</div></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- ==============================================
+         SECTION 7: GAMES & ENTERTAINMENT
+         ============================================== -->
+    <div class="page-break"></div>
+    <div class="doc-header">
+        <span class="doc-header-title">Games & Fun Commands</span>
+        <span class="doc-header-brand">Azirytech Documentation</span>
+    </div>
+
+    <div class="section-banner">
+        <div class="section-title">🎮 7. Games & Group Entertainment</div>
+        <span class="section-count">7 Commands</span>
+    </div>
+
+    <table class="cmd-table">
+        <thead>
+            <tr>
+                <th style="width: 20%;">Command</th>
+                <th style="width: 25%;">Syntax</th>
+                <th style="width: 12%;">Access</th>
+                <th style="width: 43%;">Description & Example</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="cmd-code">.tictactoe</span></td>
+                <td><span class="cmd-syntax">.tictactoe @user</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Launches a live interactive Tic-Tac-Toe match in the chat.<div class="cmd-example">Example: .tictactoe @user</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.hangman</span></td>
+                <td><span class="cmd-syntax">.hangman</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Starts a word-guessing Hangman challenge with interactive board.<div class="cmd-example">Example: .hangman</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.guess</span></td>
+                <td><span class="cmd-syntax">.guess &lt;letter&gt;</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Submits a letter guess in an active Hangman session.<div class="cmd-example">Example: .guess a</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.trivia</span></td>
+                <td><span class="cmd-syntax">.trivia</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Generates a multi-choice general knowledge quiz question.<div class="cmd-example">Example: .trivia</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.answer</span></td>
+                <td><span class="cmd-syntax">.answer &lt;option&gt;</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Submits your answer to the active trivia question.<div class="cmd-example">Example: .answer B</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.truth</span></td>
+                <td><span class="cmd-syntax">.truth</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Gives an exciting Truth question for party games.<div class="cmd-example">Example: .truth</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.dare</span></td>
+                <td><span class="cmd-syntax">.dare</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Gives a daring challenge for party games.<div class="cmd-example">Example: .dare</div></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- ==============================================
+         SECTION 8: FUN & ROLEPLAY
+         ============================================== -->
+    <div class="section-banner">
+        <div class="section-title">🎭 8. Fun, Roleplay & Social Commands</div>
+        <span class="section-count">11 Commands</span>
+    </div>
+
+    <table class="cmd-table">
+        <thead>
+            <tr>
+                <th style="width: 20%;">Command</th>
+                <th style="width: 25%;">Syntax</th>
+                <th style="width: 12%;">Access</th>
+                <th style="width: 43%;">Description & Example</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="cmd-code">.compliment</span></td>
+                <td><span class="cmd-syntax">.compliment @user</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Sends a wholesome, heartfelt compliment to a friend.<div class="cmd-example">Example: .compliment @user</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.insult</span></td>
+                <td><span class="cmd-syntax">.insult @user</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Sends a witty and playful roast to a tagged participant.<div class="cmd-example">Example: .insult @user</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.flirt</span></td>
+                <td><span class="cmd-syntax">.flirt</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Generates a charming romantic pickup line.<div class="cmd-example">Example: .flirt</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.shayari</span></td>
+                <td><span class="cmd-syntax">.shayari</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Generates poetic Shayari verses.<div class="cmd-example">Example: .shayari</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.ship</span></td>
+                <td><span class="cmd-syntax">.ship @user1 @user2</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Calculates romantic compatibility percentage between two users.<div class="cmd-example">Example: .ship @alex @sarah</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.character</span></td>
+                <td><span class="cmd-syntax">.character @user</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Generates a humorous personality profile card.<div class="cmd-example">Example: .character @user</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.wasted</span></td>
+                <td><span class="cmd-syntax">.wasted @user</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Creates a GTA-style "Wasted" death overlay on the user's avatar.<div class="cmd-example">Example: .wasted @user</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.simp</span></td>
+                <td><span class="cmd-syntax">.simp @user</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Measures the funny "Simp Percentage" for a user.<div class="cmd-example">Example: .simp @user</div></td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.stupid</span></td>
+                <td><span class="cmd-syntax">.stupid @user [text]</span></td>
+                <td><span class="badge-perm perm-all">All</span></td>
+                <td class="cmd-desc">Generates a stupidity certificate meme card.<div class="cmd-example">Example: .stupid @user</div></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- ==============================================
+         SECTION 9: TEXTMAKER GRAPHIC STYLING
+         ============================================== -->
+    <div class="page-break"></div>
+    <div class="doc-header">
+        <span class="doc-header-title">Textmaker Graphic Styles & Anime Reactions</span>
+        <span class="doc-header-brand">Azirytech Documentation</span>
+    </div>
+
+    <div class="section-banner">
+        <div class="section-title">🔤 9. 3D Textmaker & Graphic Logos</div>
+        <span class="section-count">14 Styles</span>
+    </div>
+
+    <table class="cmd-table">
+        <thead>
+            <tr>
+                <th style="width: 25%;">Command</th>
+                <th style="width: 35%;">Syntax</th>
+                <th style="width: 40%;">Visual Effect Produced</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="cmd-code">.metallic</span></td>
+                <td><span class="cmd-syntax">.metallic &lt;text&gt;</span></td>
+                <td class="cmd-desc">Gleaming polished chrome metal 3D typography</td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.matrix</span></td>
+                <td><span class="cmd-syntax">.matrix &lt;text&gt;</span></td>
+                <td class="cmd-desc">Cyberpunk digital code rain green matrix styling</td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.neon</span></td>
+                <td><span class="cmd-syntax">.neon &lt;text&gt;</span></td>
+                <td class="cmd-desc">Vibrant glowing neon tube sign with light glare</td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.glitch</span></td>
+                <td><span class="cmd-syntax">.glitch &lt;text&gt;</span></td>
+                <td class="cmd-desc">RGB chromatic aberration digital distortion effect</td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.fire</span></td>
+                <td><span class="cmd-syntax">.fire &lt;text&gt;</span></td>
+                <td class="cmd-desc">Blazing fiery inferno flame typography</td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.thunder</span></td>
+                <td><span class="cmd-syntax">.thunder &lt;text&gt;</span></td>
+                <td class="cmd-desc">High-voltage lightning storm electric glow</td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.ice</span></td>
+                <td><span class="cmd-syntax">.ice &lt;text&gt;</span></td>
+                <td class="cmd-desc">Sub-zero crystalline frozen frost styling</td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.devil</span></td>
+                <td><span class="cmd-syntax">.devil &lt;text&gt;</span></td>
+                <td class="cmd-desc">Deep crimson demonic glowing dark fantasy text</td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.hacker</span></td>
+                <td><span class="cmd-syntax">.hacker &lt;text&gt;</span></td>
+                <td class="cmd-desc">Terminal console hooded hacker insignia badge</td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.blackpink</span></td>
+                <td><span class="cmd-syntax">.blackpink &lt;text&gt;</span></td>
+                <td class="cmd-desc">Pastel pink and dark luxury aesthetic signature</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- ==============================================
+         SECTION 10: ANIME REACTIONS
+         ============================================== -->
+    <div class="section-banner">
+        <div class="section-title">🌸 10. Anime Reaction GIFs</div>
+        <span class="section-count">8 Commands</span>
+    </div>
+
+    <table class="cmd-table">
+        <thead>
+            <tr>
+                <th style="width: 25%;">Command</th>
+                <th style="width: 35%;">Syntax</th>
+                <th style="width: 40%;">Reaction Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="cmd-code">.poke</span></td>
+                <td><span class="cmd-syntax">.poke @user</span></td>
+                <td class="cmd-desc">Sends an animated poke reaction GIF</td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.kiss</span></td>
+                <td><span class="cmd-syntax">.kiss @user</span></td>
+                <td class="cmd-desc">Sends an affectionate anime kiss GIF</td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.pat</span></td>
+                <td><span class="cmd-syntax">.pat @user</span></td>
+                <td class="cmd-desc">Sends a gentle headpat anime reaction</td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.hug</span></td>
+                <td><span class="cmd-syntax">.hug @user</span></td>
+                <td class="cmd-desc">Sends a warm anime embrace GIF</td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.cry</span></td>
+                <td><span class="cmd-syntax">.cry</span></td>
+                <td class="cmd-desc">Expresses sadness with animated tears</td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.nom</span></td>
+                <td><span class="cmd-syntax">.nom</span></td>
+                <td class="cmd-desc">Sends a playful cute eating / snacking GIF</td>
+            </tr>
+            <tr>
+                <td><span class="cmd-code">.facepalm</span></td>
+                <td><span class="cmd-syntax">.facepalm</span></td>
+                <td class="cmd-desc">Displays disbelief with an anime facepalm GIF</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- ==============================================
+         SECTION 11: SUPPORT & BRANDING
+         ============================================== -->
+    <div class="page-break"></div>
+    <div class="doc-header">
+        <span class="doc-header-title">Support & Contact Information</span>
+        <span class="doc-header-brand">Azirytech Documentation</span>
+    </div>
+
+    <div class="section-banner">
+        <div class="section-title">📞 11. Official Support & Azirytech Desk</div>
+        <span class="section-count">Official Contacts</span>
+    </div>
+
+    <div class="info-card">
+        <h4>🏢 Developed & Engineered by Azirytech</h4>
+        <p>If you need custom bot development, additional module integration, WhatsApp business automation, or dedicated hosting support, contact our engineering desk:</p>
+    </div>
+
+    <table class="cmd-table">
+        <thead>
+            <tr>
+                <th>Channel</th>
+                <th>Contact / Access Link</th>
+                <th>Operational Hours</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>🟢 WhatsApp Support</strong></td>
+                <td><span class="cmd-syntax">https://wa.me/919876543210</span></td>
+                <td>24/7 Live Monitoring</td>
+            </tr>
+            <tr>
+                <td><strong>✉️ Email Desk</strong></td>
+                <td><span class="cmd-syntax">support@knightbot.com</span></td>
+                <td>Response within 2 hours</td>
+            </tr>
+            <tr>
+                <td><strong>✈️ Telegram Channel</strong></td>
+                <td><span class="cmd-syntax">https://t.me/+3QhFUZHx-nhhZmY1</span></td>
+                <td>Community & Updates</td>
+            </tr>
+            <tr>
+                <td><strong>📢 Official Newsletter</strong></td>
+                <td><span class="cmd-syntax">https://whatsapp.com/channel/0029Va90zAnIHphOuO8Msp3A</span></td>
+                <td>Official Announcements</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div style="margin-top: 30px; text-align: center; border-top: 1px solid var(--border); padding-top: 20px;">
+        <p style="font-size: 11pt; font-weight: 800; color: var(--primary);">AZIRYTECH TECH SOLUTIONS</p>
+        <p style="font-size: 8.5pt; color: var(--text-dim);">© 2026 Azirytech & KnightBot-MD. All rights reserved. Confidential & Proprietary.</p>
+    </div>
+
+</body>
+</html>
+`;
+
+    const htmlPath = path.join(__dirname, '../public/KnightBot_Commands_Manual_Azirytech.html');
+    const pdfPath = path.join(__dirname, '../KnightBot_Commands_Manual_Azirytech.pdf');
+    const publicPdfPath = path.join(__dirname, '../public/KnightBot_Commands_Manual_Azirytech.pdf');
+
+    fs.writeFileSync(htmlPath, htmlContent, 'utf8');
+    console.log(`Saved HTML document to ${htmlPath}`);
+
+    // Try converting to PDF using headless Chrome or Edge
+    const browsers = [
+        'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+        'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
+        'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe'
+    ];
+
+    let pdfGenerated = false;
+    for (const browserPath of browsers) {
+        if (fs.existsSync(browserPath)) {
+            try {
+                console.log(`Compiling PDF using ${browserPath}...`);
+                const command = `"${browserPath}" --headless --disable-gpu --no-pdf-header-footer --print-to-pdf="${pdfPath}" "${htmlPath}"`;
+                execSync(command, { timeout: 30000 });
+                if (fs.existsSync(pdfPath)) {
+                    console.log(`✅ Successfully generated PDF: ${pdfPath}`);
+                    fs.copyFileSync(pdfPath, publicPdfPath);
+                    console.log(`✅ Copied to public download directory: ${publicPdfPath}`);
+                    pdfGenerated = true;
+                    break;
+                }
+            } catch (err) {
+                console.warn(`Browser PDF generation error with ${browserPath}:`, err.message);
+            }
+        }
+    }
+
+    if (!pdfGenerated) {
+        console.log('Falling back: HTML manual available for printing.');
+    }
+}
+
+generateManual();

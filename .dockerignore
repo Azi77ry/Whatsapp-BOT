@@ -1,0 +1,10 @@
+node_modules
+npm-debug.log
+.git
+.temp_chrome_profile
+sessions/*
+!sessions/.gitkeep
+temp/*
+!temp/.gitkeep
+tmp/*
+!tmp/.gitkeep

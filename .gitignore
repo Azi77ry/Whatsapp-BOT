@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Environment Secrets (NEVER COMMIT TO GIT)
+.env
+.env.local
+.env.*.local
+*.env
+
+# WhatsApp Auth State & Sockets (CRITICAL: Never commit session credentials)
+sessions/
+session/
+data/sessions.json
+data/*.json
+
+# Runtime & Temporary Cache
+tmp/
+temp/
+.temp_chrome_profile/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+
+# Operating System & IDE Files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
