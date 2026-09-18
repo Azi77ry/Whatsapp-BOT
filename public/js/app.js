@@ -756,11 +756,13 @@ function updateTermsUI(isAgreed) {
     const mainLabel = document.getElementById('termsMainLabel');
     const subLabel = document.getElementById('termsSubLabel');
     const btnReview = document.getElementById('btnReviewTerms');
+    const checkCircle = document.getElementById('checkBoxCircle');
     
     if (isAgreed) {
-        if (card) card.classList.add('verified');
+        if (card) card.classList.add('unlocked');
+        if (checkCircle) checkCircle.classList.add('checked');
         if (badge) {
-            badge.className = 'terms-pill pill-verified';
+            badge.className = 'terms-pill pill-agreed';
             badge.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span>Agreed</span>';
         }
         if (mainLabel) mainLabel.textContent = 'Terms of Service, Privacy & Security Protocols Accepted';
@@ -769,7 +771,8 @@ function updateTermsUI(isAgreed) {
             btnReview.innerHTML = '<i class="fa-solid fa-eye"></i> View Terms';
         }
     } else {
-        if (card) card.classList.remove('verified');
+        if (card) card.classList.remove('unlocked');
+        if (checkCircle) checkCircle.classList.remove('checked');
         if (badge) {
             badge.className = 'terms-pill pill-locked';
             badge.innerHTML = '<i class="fa-solid fa-lock"></i> <span>Locked</span>';
@@ -786,9 +789,9 @@ function updateTermsUI(isAgreed) {
 // FAQ ACCORDION HANDLER
 // ==========================================
 function toggleFaq(item) {
-    const isOpen = item.classList.contains('open');
-    document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('open'));
+    const isOpen = item.classList.contains('active');
+    document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('active'));
     if (!isOpen) {
-        item.classList.add('open');
+        item.classList.add('active');
     }
 }
