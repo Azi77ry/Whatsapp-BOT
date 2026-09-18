@@ -23,12 +23,12 @@ for (const dir of REQUIRED_DIRS) {
 
 // Auto-initialize default data JSON files if missing
 const DEFAULT_DATA_FILES = {
-    'autoStatus.json': { enabled: false, reactOn: false },
+    'autoStatus.json': { enabled: true, reactOn: true },
     'messageCount.json': { isPublic: true },
     'banned.json': [],
     'warnings.json': {},
     'userGroupData.json': { antilink: {}, antibadword: {}, welcome: {}, goodbye: {}, chatbot: {}, antitag: {} },
-    'antidelete.json': { enabled: false },
+    'antidelete.json': { enabled: true },
     'pmblocker.json': { enabled: false },
     'anticall.json': { enabled: false },
     'autoread.json': { enabled: false },

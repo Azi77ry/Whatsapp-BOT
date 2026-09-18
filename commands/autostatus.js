@@ -25,8 +25,8 @@ try {
     }
     if (!fs.existsSync(configPath)) {
         fs.writeFileSync(configPath, JSON.stringify({ 
-            enabled: false, 
-            reactOn: false 
+            enabled: true, 
+            reactOn: true 
         }, null, 2));
     }
 } catch (e) {

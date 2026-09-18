@@ -56,10 +56,10 @@ setInterval(cleanTempFolderIfLarge, 60 * 1000);
 // Load config
 function loadAntideleteConfig() {
     try {
-        if (!fs.existsSync(CONFIG_PATH)) return { enabled: false };
+        if (!fs.existsSync(CONFIG_PATH)) return { enabled: true };
         return JSON.parse(fs.readFileSync(CONFIG_PATH));
     } catch {
-        return { enabled: false };
+        return { enabled: true };
     }
 }
 
