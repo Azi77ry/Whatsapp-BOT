@@ -12,7 +12,6 @@ package-lock.json
 sessions/
 session/
 data/sessions.json
-data/*.json
 
 # Runtime & Temporary Cache
 tmp/

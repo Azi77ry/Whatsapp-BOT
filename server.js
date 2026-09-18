@@ -8,6 +8,47 @@ const fs = require('fs');
 const path = require('path');
 const url = require('url');
 
+// Auto-initialize required directories
+const REQUIRED_DIRS = [
+    path.join(__dirname, 'data'),
+    path.join(__dirname, 'sessions'),
+    path.join(__dirname, 'tmp'),
+    path.join(__dirname, 'temp')
+];
+for (const dir of REQUIRED_DIRS) {
+    if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+    }
+}
+
+// Auto-initialize default data JSON files if missing
+const DEFAULT_DATA_FILES = {
+    'autoStatus.json': { enabled: false, reactOn: false },
+    'messageCount.json': { isPublic: true },
+    'banned.json': [],
+    'warnings.json': {},
+    'userGroupData.json': { antilink: {}, antibadword: {}, welcome: {}, goodbye: {}, chatbot: {}, antitag: {} },
+    'antidelete.json': { enabled: false },
+    'pmblocker.json': { enabled: false },
+    'anticall.json': { enabled: false },
+    'autoread.json': { enabled: false },
+    'autotyping.json': { enabled: false },
+    'owner.json': [],
+    'premium.json': [],
+    'sessions.json': []
+};
+
+for (const [file, defaultVal] of Object.entries(DEFAULT_DATA_FILES)) {
+    const filePath = path.join(__dirname, 'data', file);
+    if (!fs.existsSync(filePath)) {
+        try {
+            fs.writeFileSync(filePath, JSON.stringify(defaultVal, null, 2));
+        } catch (e) {
+            console.error(`Error initializing ${file}:`, e.message);
+        }
+    }
+}
+
 const settings = require('./settings');
 const sessionManager = require('./lib/sessionManager');
 
