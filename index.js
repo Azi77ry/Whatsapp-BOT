@@ -51,7 +51,7 @@ const store = require('./lib/lightweight_store')
 // Initialize store
 store.readFromFile()
 const settings = require('./settings')
-setInterval(() => store.writeToFile(), settings.storeWriteInterval || 10000)
+setInterval(() => store.writeToFile(), settings.storeWriteInterval || 30000)
 
 // Memory optimization - Force garbage collection if available
 setInterval(() => {
@@ -64,8 +64,8 @@ setInterval(() => {
 // Memory monitoring - Restart if RAM gets too high
 setInterval(() => {
     const used = process.memoryUsage().rss / 1024 / 1024
-    if (used > 400) {
-        console.log('⚠️ RAM too high (>400MB), restarting bot...')
+    if (used > 512) {
+        console.log('⚠️ RAM too high (>512MB), restarting bot...')
         process.exit(1) // Panel will auto-restart
     }
 }, 30_000) // check every 30 seconds
@@ -89,6 +89,10 @@ const question = (text) => {
     }
 }
 
+
+// Track restart attempts to prevent infinite recursion stack overflow
+let _botRestartCount = 0;
+const _MAX_BOT_RESTARTS = 10;
 
 async function startXeonBotInc() {
     try {
@@ -116,7 +120,7 @@ async function startXeonBotInc() {
             msgRetryCounterCache,
             defaultQueryTimeoutMs: 60000,
             connectTimeoutMs: 60000,
-            keepAliveIntervalMs: 10000,
+            keepAliveIntervalMs: 25000,
         })
 
         // Save credentials when they update
@@ -143,10 +147,6 @@ async function startXeonBotInc() {
             }
             if (mek.key.id.startsWith('BAE5') && mek.key.id.length === 16) return
 
-            // Clear message retry cache to prevent memory bloat
-            if (XeonBotInc?.msgRetryCounterCache) {
-                XeonBotInc.msgRetryCounterCache.clear()
-            }
 
             try {
                 await handleMessages(XeonBotInc, chatUpdate, true)
@@ -245,26 +245,43 @@ async function startXeonBotInc() {
         }, 3000)
     }
 
+    // Connection watchdog — if stuck in 'connecting' for >90s, force restart
+    let _connectionWatchdog = null;
+    const _resetWatchdog = () => {
+        if (_connectionWatchdog) clearTimeout(_connectionWatchdog);
+        _connectionWatchdog = null;
+    };
+
     // Connection handling
     XeonBotInc.ev.on('connection.update', async (s) => {
         const { connection, lastDisconnect, qr } = s
         
         if (qr) {
             console.log(chalk.yellow('📱 QR Code generated. Please scan with WhatsApp.'))
+            _resetWatchdog();
         }
         
         if (connection === 'connecting') {
             console.log(chalk.yellow('🔄 Connecting to WhatsApp...'))
+            // Start watchdog — if we don't connect in 90s, restart
+            _resetWatchdog();
+            _connectionWatchdog = setTimeout(() => {
+                console.log(chalk.red('⚠️ Connection watchdog: stuck in connecting >90s, restarting...'))
+                try { XeonBotInc.ev.removeAllListeners(); XeonBotInc.end(); } catch (e) {}
+                _scheduleRestart();
+            }, 90_000);
         }
         
         if (connection == "open") {
+            _resetWatchdog();
+            _botRestartCount = 0; // reset restart counter on successful connect
             console.log(chalk.magenta(` `))
             console.log(chalk.yellow(`🌿Connected to => ` + JSON.stringify(XeonBotInc.user, null, 2)))
 
             try {
                 const botNumber = XeonBotInc.user.id.split(':')[0] + '@s.whatsapp.net';
                 await XeonBotInc.sendMessage(botNumber, {
-                    text: `🤖 Bot Connected Successfully!\n\n⏰ Time: ${new Date().toLocaleString()}\n✅ Status: Online and Ready!\n\n✅Make sure to join below channel`,
+                    text: `🤖 Bot Connected Successfully!\n\n⏰ Time: ${new Date().toLocaleString()}\n✅ Status: Online and Ready!`,
                     contextInfo: {
                         forwardingScore: 1,
                         isForwarded: true,
@@ -280,17 +297,17 @@ async function startXeonBotInc() {
             }
 
             await delay(1999)
-            console.log(chalk.yellow(`\n\n                  ${chalk.bold.blue(`[ ${global.botname || 'KNIGHT BOT'} ]`)}\n\n`))
+            console.log(chalk.yellow(`\n\n                  ${chalk.bold.blue(`[ ${global.botname || 'AZIRYTECH BOT'} ]`)}\n\n`))
             console.log(chalk.cyan(`< ================================================== >`))
-            console.log(chalk.magenta(`\n${global.themeemoji || '•'} YT CHANNEL: MR UNIQUE HACKER`))
-            console.log(chalk.magenta(`${global.themeemoji || '•'} GITHUB: mrunqiuehacker`))
+            console.log(chalk.magenta(`\n${global.themeemoji || '•'} SUPPORT: aziziiddi555@gmail.com`))
+            console.log(chalk.magenta(`${global.themeemoji || '•'} WA: +255692350076`))
             console.log(chalk.magenta(`${global.themeemoji || '•'} WA NUMBER: ${owner}`))
-            console.log(chalk.magenta(`${global.themeemoji || '•'} CREDIT: MR UNIQUE HACKER`))
-            console.log(chalk.green(`${global.themeemoji || '•'} 🤖 Bot Connected Successfully! ✅`))
+            console.log(chalk.green(`${global.themeemoji || '•'} 🤖 Azirytech Bot Connected Successfully! ✅`))
             console.log(chalk.blue(`Bot Version: ${settings.version}`))
         }
         
         if (connection === 'close') {
+            _resetWatchdog();
             const shouldReconnect = (lastDisconnect?.error)?.output?.statusCode !== DisconnectReason.loggedOut
             const statusCode = lastDisconnect?.error?.output?.statusCode
             
@@ -304,12 +321,11 @@ async function startXeonBotInc() {
                     console.error('Error deleting session:', error)
                 }
                 console.log(chalk.red('Session logged out. Please re-authenticate.'))
+                return; // Don't reconnect after logout
             }
             
             if (shouldReconnect) {
-                console.log(chalk.yellow('Reconnecting...'))
-                await delay(5000)
-                startXeonBotInc()
+                _scheduleRestart();
             }
         }
     })
@@ -357,12 +373,8 @@ async function startXeonBotInc() {
         await handleGroupParticipantUpdate(XeonBotInc, update);
     });
 
-    XeonBotInc.ev.on('messages.upsert', async (m) => {
-        if (m.messages[0].key && m.messages[0].key.remoteJid === 'status@broadcast') {
-            await handleStatus(XeonBotInc, m);
-        }
-    });
-
+    // NOTE: status.update and messages.reaction are handled inside the single
+    // messages.upsert listener above to avoid duplicate processing.
     XeonBotInc.ev.on('status.update', async (status) => {
         await handleStatus(XeonBotInc, status);
     });
@@ -374,9 +386,22 @@ async function startXeonBotInc() {
     return XeonBotInc
     } catch (error) {
         console.error('Error in startXeonBotInc:', error)
-        await delay(5000)
-        startXeonBotInc()
+        _scheduleRestart();
     }
+}
+
+// Centralized restart scheduler with exponential backoff + jitter
+function _scheduleRestart() {
+    if (_botRestartCount >= _MAX_BOT_RESTARTS) {
+        console.log(chalk.red(`⛔ Max restart attempts (${_MAX_BOT_RESTARTS}) reached. Please check your session/credentials.`))
+        return;
+    }
+    _botRestartCount++;
+    const baseDelay = Math.min(_botRestartCount * 5000, 60000);
+    const jitter = Math.floor(Math.random() * 2000);
+    const waitMs = baseDelay + jitter;
+    console.log(chalk.yellow(`🔄 Reconnecting in ${(waitMs/1000).toFixed(1)}s... (attempt ${_botRestartCount}/${_MAX_BOT_RESTARTS})`))
+    setTimeout(() => startXeonBotInc(), waitMs);
 }
 
 
@@ -385,6 +410,7 @@ startXeonBotInc().catch(error => {
     console.error('Fatal error:', error)
     process.exit(1)
 })
+
 process.on('uncaughtException', (err) => {
     console.error('Uncaught Exception:', err)
 })
@@ -392,6 +418,15 @@ process.on('uncaughtException', (err) => {
 process.on('unhandledRejection', (err) => {
     console.error('Unhandled Rejection:', err)
 })
+
+// Graceful shutdown — flush store before exit
+function gracefulShutdown(signal) {
+    console.log(chalk.yellow(`\n⚡ ${signal} received. Saving state before shutdown...`))
+    try { store.writeToFile(); } catch (e) {}
+    process.exit(0);
+}
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT',  () => gracefulShutdown('SIGINT'));
 
 let file = require.resolve(__filename)
 fs.watchFile(file, () => {

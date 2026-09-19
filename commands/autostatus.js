@@ -18,16 +18,32 @@ const channelInfo = {
 const configPath = path.join(__dirname, '../data/autoStatus.json');
 
 // Initialize config file and directory if it doesn't exist
+let _configCache = null; // In-memory cache to avoid disk reads on every status event
+
+function readConfig() {
+    if (_configCache) return _configCache;
+    try {
+        _configCache = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+    } catch (e) {
+        _configCache = { enabled: true, reactOn: true };
+    }
+    return _configCache;
+}
+
+function writeConfig(config) {
+    _configCache = config; // Update cache
+    fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+}
+
 try {
     const configDir = path.dirname(configPath);
     if (!fs.existsSync(configDir)) {
         fs.mkdirSync(configDir, { recursive: true });
     }
     if (!fs.existsSync(configPath)) {
-        fs.writeFileSync(configPath, JSON.stringify({
-            enabled: true,
-            reactOn: true
-        }, null, 2));
+        writeConfig({ enabled: true, reactOn: true });
+    } else {
+        readConfig(); // Pre-warm the cache
     }
 } catch (e) {
     console.error('Error initializing autoStatus.json:', e.message);
@@ -47,7 +63,7 @@ async function autoStatusCommand(sock, chatId, msg, args) {
         }
 
         // Read current config
-        let config = JSON.parse(fs.readFileSync(configPath));
+        let config = readConfig();
 
         // If no arguments, show current status
         if (!args || args.length === 0) {
@@ -65,14 +81,14 @@ async function autoStatusCommand(sock, chatId, msg, args) {
 
         if (command === 'on') {
             config.enabled = true;
-            fs.writeFileSync(configPath, JSON.stringify(config));
+            writeConfig(config);
             await sock.sendMessage(chatId, {
                 text: '✅ Auto status view has been enabled!\nBot will now automatically view all contact statuses.',
                 ...channelInfo
             });
         } else if (command === 'off') {
             config.enabled = false;
-            fs.writeFileSync(configPath, JSON.stringify(config));
+            writeConfig(config);
             await sock.sendMessage(chatId, {
                 text: '❌ Auto status view has been disabled!\nBot will no longer automatically view statuses.',
                 ...channelInfo
@@ -90,14 +106,14 @@ async function autoStatusCommand(sock, chatId, msg, args) {
             const reactCommand = args[1].toLowerCase();
             if (reactCommand === 'on') {
                 config.reactOn = true;
-                fs.writeFileSync(configPath, JSON.stringify(config));
+                writeConfig(config);
                 await sock.sendMessage(chatId, {
                     text: '💫 Status reactions have been enabled!\nBot will now react to status updates.',
                     ...channelInfo
                 });
             } else if (reactCommand === 'off') {
                 config.reactOn = false;
-                fs.writeFileSync(configPath, JSON.stringify(config));
+                writeConfig(config);
                 await sock.sendMessage(chatId, {
                     text: '❌ Status reactions have been disabled!\nBot will no longer react to status updates.',
                     ...channelInfo
@@ -127,10 +143,8 @@ async function autoStatusCommand(sock, chatId, msg, args) {
 // Function to check if auto status is enabled
 function isAutoStatusEnabled() {
     try {
-        const config = JSON.parse(fs.readFileSync(configPath));
-        return config.enabled;
+        return readConfig().enabled;
     } catch (error) {
-        console.error('Error checking auto status config:', error);
         return false;
     }
 }
@@ -138,10 +152,8 @@ function isAutoStatusEnabled() {
 // Function to check if status reactions are enabled
 function isStatusReactionEnabled() {
     try {
-        const config = JSON.parse(fs.readFileSync(configPath));
-        return config.reactOn;
+        return readConfig().reactOn;
     } catch (error) {
-        console.error('Error checking status reaction config:', error);
         return false;
     }
 }
